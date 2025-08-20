@@ -49,7 +49,4 @@ def crear_pantalla(): # + menu (despues lo saco)
 pygame.quit()
 
 
-height= 600
-width = 800
-
 main()
