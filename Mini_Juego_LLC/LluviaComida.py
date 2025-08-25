@@ -16,15 +16,29 @@ def inicializar():
     fuente_grande = pygame.font.SysFont("Arial", 60)
     clock = pygame.time.Clock()
     return pantalla, fuente, fuente_grande, clock
+def cargar_record(ruta="Mini_Juego_LLC/record.txt"):
+    try:
+        with open(ruta, "r") as archivo:
+            return int(archivo.read())
+    except (FileNotFoundError, ValueError):
+            record=0
+            return record
+def guardar_record(puntaje, ruta="Mini_Juego_LLC/record.txt"):
+    record = cargar_record(ruta)
+    if puntaje > record:
+        with open(ruta, "w") as archivo:
+            archivo.write(str(puntaje))
+    
+
 
 def cargar_imagenes():
-    jugador_img = pygame.image.load('Mini_juego_LLC/salame.png').convert_alpha()
+    jugador_img = pygame.image.load('Mini_juego_LLC/imagenes/salame.png').convert_alpha()
     jugador_img = pygame.transform.scale(jugador_img, (75, 75))
     comidas_imgs = [
-        pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/comida{i+1}.png").convert_alpha(), (40, 40))
+        pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/imagenes/comida{i+1}.png").convert_alpha(), (40, 40))
         for i in range(4)
     ]
-    comida_mala_img = pygame.transform.scale(pygame.image.load("Mini_Juego_LLC/comida_mala.png").convert_alpha(), (40, 40))
+    comida_mala_img = pygame.transform.scale(pygame.image.load("Mini_Juego_LLC/imagenes/comida_mala.png").convert_alpha(), (40, 40))
     return jugador_img, comidas_imgs, comida_mala_img
 
 def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
@@ -101,19 +115,21 @@ def actualizar_jugador(teclas, jugador_rect, velocidad_y, en_suelo, salto, grave
 
     return jugador_rect, velocidad_y, en_suelo
 
-def actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje):
+def actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas):
     for i in range(len(comidas)):
         img, rect = comidas[i]
         rect.y += velocidad_comida
         if rect.top > ALTO:
             rect.x = random.randint(0, ANCHO - 40)
             rect.y = random.randint(-600, -40)
+            vidas-=1
         if rect.colliderect(jugador_rect):
             puntaje += 1
             rect.x = random.randint(0, ANCHO - 40)
             rect.y = random.randint(-600, -40)
         comidas[i] = (img, rect)
-    return comidas, puntaje
+
+    return comidas, puntaje, vidas
 
 def actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas):
     comida_mala_rect.y += velocidad_comida
@@ -126,13 +142,15 @@ def actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vid
         comida_mala_rect.y = random.randint(-600, -40)
     return comida_mala_rect, vidas
 
-def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over):
+def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over,record):
     pantalla.fill(BLANCO)
     pantalla.blit(jugador_img, jugador_rect)
     pygame.draw.rect(pantalla, (0, 200, 0), suelo)
     for img, rect in comidas:
         pantalla.blit(img, rect)
     pantalla.blit(comida_mala_img, comida_mala_rect)
+    texto_record=fuente.render(f"Record: {record}", True, NEGRO)
+    pantalla.blit(texto_record, (ANCHO // 2 - texto_record.get_width() // 2, 10))
     texto_puntaje = fuente.render(f"Puntos: {puntaje}", True, NEGRO)
     pantalla.blit(texto_puntaje, (ANCHO - 150, 10))
     texto_vidas = fuente.render(f"Vidas: {vidas}", True, ROJO)
@@ -158,10 +176,13 @@ def main():
     puntaje = 0
     vidas = 3
     game_over = False
-
+    record= cargar_record()
     while True:
         reiniciar_juego = manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect)
         if reiniciar_juego:
+            if puntaje > record:
+                guardar_record(puntaje)
+                record=puntaje
             jugador_rect, comidas, comida_mala_rect = reiniciar(jugador_rect, comidas, comida_mala_rect)
             puntaje = 0
             vidas = 3
@@ -172,13 +193,13 @@ def main():
             jugador_rect, velocidad_y, en_suelo = actualizar_jugador(
                 teclas, jugador_rect, velocidad_y, en_suelo, salto, gravedad, velocidad_movimiento, suelo
             )
-            comidas, puntaje = actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje)
+            comidas, puntaje, vidas = actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas)
             comida_mala_rect, vidas = actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas)
             if vidas <= 0:
                 game_over = True
 
         dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect,
-                fuente, fuente_grande, puntaje, vidas, game_over)
+        fuente, fuente_grande, puntaje, vidas, game_over, record)
         clock.tick(FPS)
 
 if __name__ == "__main__":
