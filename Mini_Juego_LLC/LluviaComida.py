@@ -8,6 +8,30 @@ NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
 FPS = 60
 
+def pantalla_inicio(pantalla, fuente, fuente_grande):
+    pantalla.fill(BLANCO)
+    titulo = fuente_grande.render("¡Luvia de comida!", True, ROJO)
+    pantalla.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 150))
+    instrucciones = [
+        "Mueve con las flechas ← →",
+        "Salta con ESPACIO",
+        "Atrapa la comida buena para sumar puntos",
+        "Evita la comida mala y no dejes caer la buena",
+        "Presiona cualquier tecla para comenzar"
+    ]
+    for i, texto in enumerate(instrucciones):
+        linea = fuente.render(texto, True, NEGRO)
+        pantalla.blit(linea, (ANCHO // 2 - linea.get_width() // 2, 250 + i * 40))
+    pygame.display.flip()
+    esperando = True
+    while esperando:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN:
+                esperando = False
+
 def inicializar():
     pygame.init()
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
@@ -166,7 +190,7 @@ def main():
     pantalla, fuente, fuente_grande, clock = inicializar()
     jugador_img, comidas_imgs, comida_mala_img = cargar_imagenes()
     jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
-
+    pantalla_inicio(pantalla, fuente, fuente_grande)
     velocidad_y = 0
     gravedad = 0.5
     salto = -10
