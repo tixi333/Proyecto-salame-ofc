@@ -28,10 +28,6 @@ def crear_pantalla(): # + menu (despues lo saco)
 
     play1 = pygame.image.load("play1.png") #carga boton start
     play1_scale = pygame.transform.scale(play1, (200, 200)) #cambia sus medidas
-    play1_width = play1_scale.get_width() #saca el ancho de la imagen
-    play1_height = play1_scale.get_height() #saca el alto de la imagen
-    x_start = (width - play1_width) // 2 #sirve para cambiar su ubicacion despues
-    y_start = (height - play1_height) // 2 #lo mismo de arriba
     play1_scale_rect = play1_scale.get_rect(center=(width//2, height//2)) #rect del boton
 
     options1 = pygame.image.load("play1.png")
@@ -41,6 +37,24 @@ def crear_pantalla(): # + menu (despues lo saco)
     credits1 = pygame.image.load("play1.png")
     credits1_scale = pygame.transform.scale(credits1,(200,200))
     credits1_scale_rect = options1_scale.get_rect(center= (width//2, 400))
+    
+    #general cross
+    cross = pygame.image.load("cross.jpg")
+    cross_scale=pygame.transform.scale(cross,(200,200))
+    cros_scale_rect = cross_scale.get_rect(center= (width/2, 400))
+
+    ####### credits screen
+
+    credit_F = pygame.image.load("cross.jpg")
+    credit_F_scale = pygame.transform.scale(credit_F, (200,200))
+    credit_FS_rect = credit_F_scale.get_rect(center= (width//2,400))
+
+    ###### option screen
+
+    option_F = pygame.image.load("cross.jpg")
+    optionsF_scale = pygame.transform.scale(option_F, (200,200))
+    optionsF_scale_rect = optionsF_scale.get_rect(center = (width//2,400))
+
 
     run = True
 
