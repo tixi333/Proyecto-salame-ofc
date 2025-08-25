@@ -22,15 +22,15 @@ def crear_pantalla(): # + menu (despues lo saco)
     back = pygame.image.load("menu.jpg").convert() #carga fondo
     back_scale = pygame.transform.scale(back, (width, height)) #convierte sus medidas a las de la pantalla
 
-    title = pygame.image.load("play1.png")
+    title = pygame.image.load("play1.png").convert_alpha()
     title_scale = pygame.transform.scale(title,(100,100))
     title_scale_rect = title_scale.get_rect(center= (width//2, 100))
 
-    play1 = pygame.image.load("play1.png") #carga boton start
+    play1 = pygame.image.load("play1.png").convert_alpha() #carga boton start
     play1_scale = pygame.transform.scale(play1, (100, 100)) #cambia sus medidas
     play1_scale_rect = play1_scale.get_rect(center=(width//2, height//2)) #rect del boton
 
-    options1 = pygame.image.load("play1.png")
+    options1 = pygame.image.load("play1.png").convert_alpha()
     options1_scale = pygame.transform.scale(options1,(100,100))
     options1_scale_rect = options1_scale.get_rect(center =(width//2, 400))
 
@@ -41,7 +41,7 @@ def crear_pantalla(): # + menu (despues lo saco)
     #general cross
     cross = pygame.image.load("cross.jpg")
     cross_scale=pygame.transform.scale(cross,(100,100))
-    cros_scale_rect = cross_scale.get_rect(center= (width/2, 400))
+    cross_scale_rect = cross_scale.get_rect(center= (width/2, 400))
 
     ####### credits screen
 
@@ -69,23 +69,20 @@ def crear_pantalla(): # + menu (despues lo saco)
                     print("options")
                 elif event.button == 1 and credits1_scale_rect.collidepoint(event.pos):
                     print("creditos")
-    
+                    screen.blit(credit_F_scale,credit_FS_rect)
+                    pygame.display.flip()
+
         screen.blit(back_scale, (0, 0))
         screen.blit(title_scale,title_scale_rect)
         screen.blit(play1_scale, (play1_scale_rect))
-        screen.blit(options1_scale, options1_scale_rect)
+        screen.blit(options1_scale, options1_scale_rect)                
         screen.blit(credits1_scale, credits1_scale_rect)
 
 
         pygame.draw.line(screen, color,
-                        (title_scale_rect.left, title_scale_rect.bottom),
-                        (title_scale_rect.right, title_scale_rect.bottom)
-                        ,5)
-
-        pygame.display.flip()
-
-        screen.blit(credit_F_scale,credit_FS_rect)
-
+                            (title_scale_rect.left, title_scale_rect.bottom),
+                            (title_scale_rect.right, title_scale_rect.bottom)
+                            ,5)
         pygame.display.flip()
 
 pygame.quit()
