@@ -28,13 +28,13 @@ def crear_pantalla(): # + menu (despues lo saco)
     text_rect_options = text_surface_options.get_rect(center=(width//2, 350)) #rect del texto options
     text_rect_credits = text_surface_credits.get_rect(center=(width//2, 450)) #rect del texto credits
         
-    start = pygame.image.load("start.png") #carga boton start
-    start_scale = pygame.transform.scale(start, (200, 100)) #cambia sus medidas
-    start_width = start_scale.get_width() #saca el ancho de la imagen
-    start_height = start_scale.get_height() #saca el alto de la imagen
-    x_start = (width - start_width) // 2 #sirve para cambiar su ubicacion despues
-    y_start = (height - start_height) // 2 #lo mismo de arriba
-    start_scale_rect = start_scale.get_rect(center=(width//2, height//2)) #rect del boton
+    play1 = pygame.image.load("play1.png") #carga boton start
+    play1_scale = pygame.transform.scale(play1, (200, 100)) #cambia sus medidas
+    play1_width = play1_scale.get_width() #saca el ancho de la imagen
+    play1_height = play1_scale.get_height() #saca el alto de la imagen
+    x_start = (width - play1_width) // 2 #sirve para cambiar su ubicacion despues
+    y_start = (height - play1_height) // 2 #lo mismo de arriba
+    play1_scale_rect = play1_scale.get_rect(center=(width//2, height//2)) #rect del boton
 
 
     run = True
@@ -44,11 +44,11 @@ def crear_pantalla(): # + menu (despues lo saco)
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1 and start_scale_rect.collidepoint(event.pos):
+                if event.button == 1 and play1_scale_rect.collidepoint(event.pos):
                     print("prueba")
     
         screen.blit(back_scale, (0, 0))
-        screen.blit(start_scale, (start_scale_rect))
+        screen.blit(play1_scale, (play1_scale_rect))
         screen.blit(text_surface_salame, text_rect_salame)
         screen.blit(text_surface_options, text_rect_options)
         screen.blit(text_surface_credits, text_rect_credits)
