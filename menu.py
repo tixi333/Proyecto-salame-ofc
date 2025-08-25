@@ -17,25 +17,30 @@ def crear_pantalla(): # + menu (despues lo saco)
     
     screen = pygame.display.set_mode((width, height)) 
     
-    text_surface_salame = font.render('Cuida a tu salamín', True, color) #texto salame
-    text_surface_options = font.render('Opciones',True,color) #texto options
-    text_surface_credits = font.render('Creditos',True,color) #text credits
+    ###text_surface_salame = font.render('Cuida a tu salamín', True, color) #texto salame
     
     back = pygame.image.load("menu.jpg").convert() #carga fondo
     back_scale = pygame.transform.scale(back, (width, height)) #convierte sus medidas a las de la pantalla
-    
-    text_rect_salame = text_surface_salame.get_rect(center=(width//2, 100)) #rect del texto
-    text_rect_options = text_surface_options.get_rect(center=(width//2, 350)) #rect del texto options
-    text_rect_credits = text_surface_credits.get_rect(center=(width//2, 450)) #rect del texto credits
-        
+
+    title = pygame.image.load("play1.png")
+    title_scale = pygame.transform.scale(title,(500,300))
+    title_scale_rect = title_scale.get_rect(center= (width//2, 100))
+
     play1 = pygame.image.load("play1.png") #carga boton start
-    play1_scale = pygame.transform.scale(play1, (200, 100)) #cambia sus medidas
+    play1_scale = pygame.transform.scale(play1, (200, 200)) #cambia sus medidas
     play1_width = play1_scale.get_width() #saca el ancho de la imagen
     play1_height = play1_scale.get_height() #saca el alto de la imagen
     x_start = (width - play1_width) // 2 #sirve para cambiar su ubicacion despues
     y_start = (height - play1_height) // 2 #lo mismo de arriba
     play1_scale_rect = play1_scale.get_rect(center=(width//2, height//2)) #rect del boton
 
+    options1 = pygame.image.load("play1.png")
+    options1_scale = pygame.transform.scale(options1,(200,200))
+    options1_scale_rect = options1_scale.get_rect(center =(width//2, 500))
+
+    credits1 = pygame.image.load("play1.png")
+    credits1_scale = pygame.transform.scale(credits1,(200,200))
+    credits1_scale_rect = options1_scale.get_rect(center= (width//2, 400))
 
     run = True
 
@@ -45,18 +50,22 @@ def crear_pantalla(): # + menu (despues lo saco)
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1 and play1_scale_rect.collidepoint(event.pos):
-                    print("prueba")
+                    print("play")
+                elif event.button == 1 and options1_scale_rect.collidepoint(event.pos):
+                    print("options")
+                elif event.button == 1 and credits1_scale_rect.collidepoint(event.pos):
+                    print("creditos")
     
         screen.blit(back_scale, (0, 0))
+        screen.blit(title_scale,title_scale_rect)
         screen.blit(play1_scale, (play1_scale_rect))
-        screen.blit(text_surface_salame, text_rect_salame)
-        screen.blit(text_surface_options, text_rect_options)
-        screen.blit(text_surface_credits, text_rect_credits)
+        screen.blit(options1_scale, options1_scale_rect)
+        screen.blit(credits1_scale, credits1_scale_rect)
 
 
         pygame.draw.line(screen, color,
-                        (text_rect_salame.left, text_rect_salame.bottom),
-                        (text_rect_salame.right, text_rect_salame.bottom)
+                        (title_scale_rect.left, title_scale_rect.bottom),
+                        (title_scale_rect.right, title_scale_rect.bottom)
                         ,5)
 
         pygame.display.flip()
