@@ -35,15 +35,20 @@ arrowleft_rect = arrowleft.get_rect()
 arrowleft_rect.centery = sal_rect.centery
 arrowleft_rect.right = sal_rect.left - 50
 
-#especifico info
-info_text = font.render("Presiona <i> para info", True, BLACK)
+#básicamente, el texto de presiona i para info
+i_text = font.render("Presiona <i> para info", True, BLACK)
+i_rect = i_text.get_rect()
+i_rect.midtop = (width // 2, 0)
+
+#texto info 
+info_text = font.render("iahygfjhjsgjhb", True, BLACK)
 info_rect = info_text.get_rect()
-info_rect.midtop = (width // 2, 0)
-
-
+info_rect.center = (width // 2, height // 2)
+show_info = False
 
 backgrounds = [YELLOW, BLUE, GREEN]
 index = 0
+
 
 running = True
 while running:
@@ -56,15 +61,20 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
             elif event.key == pygame.K_i:
-                pass
+                show_info = not show_info
+                       
+    if show_info:
+        screen.fill(WHITE)
+        screen.blit(info_text, info_rect)
+    else:
+        screen.fill(backgrounds[index])
+        screen.blit(sal, sal_rect)
+        screen.blit(arrowright, arrowright_rect)
+        screen.blit(arrowleft, arrowleft_rect)
+        screen.blit(i_text, i_rect)
+        if backgrounds[index] == BLUE:
+            pass
 
-
-    screen.fill(backgrounds[index])
-
-    screen.blit(sal, sal_rect)
-    screen.blit(arrowright, arrowright_rect)
-    screen.blit(arrowleft, arrowleft_rect)
-    screen.blit(info_text, info_rect)
     pygame.display.flip()
 
 
