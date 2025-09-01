@@ -10,7 +10,7 @@ FPS = 60
 
 def pantalla_inicio(pantalla, fuente, fuente_grande):
     pantalla.fill(BLANCO)
-    titulo = fuente_grande.render("¡Luvia de comida!", True, ROJO)
+    titulo = fuente_grande.render("¡LLuvia de comida!", True, ROJO)
     pantalla.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 150))
     instrucciones = [
         "Mueve con las flechas ← →",
