@@ -18,7 +18,7 @@ def crear_pantalla(): # + menu (despues lo saco)
     screen = pygame.display.set_mode((width, height)) 
     
     ###text_surface_salame = font.render('Cuida a tu salamín', True, color) #texto salame
-    
+
     back = pygame.image.load("menu.jpg").convert() #carga fondo
     back_scale = pygame.transform.scale(back, (width, height)) #convierte sus medidas a las de la pantalla
 
