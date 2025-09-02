@@ -11,12 +11,12 @@ pygame.display.set_caption("Cuida a tu salame")
 black = (0,0,0)
 white = (255,255,255) 
 grey = (128,128,128)
-font = pygame.font.Font("monogram-extended.ttf", 100) 
-text_play = font.render("To play screen", True, grey)
-text_options = font.render("To options screen", True, grey)
-text_credits = font.render("To credits screen", True, grey)
+font = pygame.font.Font("monogram-extended.ttf", 50) 
+text_play = font.render("play screen", True, grey)
+text_options = font.render("options screen", True, grey)
+text_credits = font.render("credits screen", True, grey)
 
-text_exit = font.render("ESC go back to menu", True, grey)
+text_exit = font.render("ESC - (go back)", True, grey)
 
 back = pygame.image.load("menu.jpg").convert()
 back_scale = pygame.transform.scale(back, (width, height)) 
@@ -28,6 +28,13 @@ title_scale_rect = title_scale.get_rect(center= (width//2, 100))
 back_buttons = pygame.image.load("frame3.png").convert()
 back_buttons_scale = pygame.transform.scale(back_buttons,(width, height))
 back_buttons_scale_rect = back_buttons_scale.get_rect(center= (width//2, height//2))
+
+## ---------------- Text
+            #      Credits       #
+t_credits1 = font.render("Game developed by:", True, grey)
+t_credits2 = font.render("- Ticiana Ramirez", True, grey)
+t_credits3 = font.render("- Benjamin Ramirez", True, grey)
+t_credits4 = font.render("- Mercedes Kuroki", True, grey)
 ## ---------------- Class Button
 
 class Button:
@@ -135,8 +142,11 @@ while running:
         screen.blit(text_exit,(10,300))
     elif actual_screen == "credits_screen":
         screen.blit(back_buttons_scale,(0,0))
-        screen.blit(text_credits,(10,100))
-        screen.blit(text_exit,(10,300))
+        screen.blit(t_credits1, (250,100))
+        screen.blit(t_credits2, (250,150))
+        screen.blit(t_credits3, (250,200))
+        screen.blit(t_credits4,(250,250))
+        screen.blit(text_exit,(300,500))
     pygame.display.flip()
 
 pygame.quit()
