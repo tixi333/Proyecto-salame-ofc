@@ -10,12 +10,13 @@ pygame.display.set_caption("Cuida a tu salame")
     
 black = (0,0,0)
 white = (255,255,255) 
+grey = (128,128,128)
 font = pygame.font.Font("monogram-extended.ttf", 100) 
-text_play = font.render("To play screen", True, white)
-text_options = font.render("To options screen", True, white)
-text_credits = font.render("To credits screen", True, white)
+text_play = font.render("To play screen", True, grey)
+text_options = font.render("To options screen", True, grey)
+text_credits = font.render("To credits screen", True, grey)
 
-text_exit = font.render("ESC go back to menu", True, white)
+text_exit = font.render("ESC go back to menu", True, grey)
 
 back = pygame.image.load("menu.jpg").convert()
 back_scale = pygame.transform.scale(back, (width, height)) 
@@ -24,6 +25,9 @@ title = pygame.image.load("title.png").convert_alpha()
 title_scale = pygame.transform.scale(title,(500,100))
 title_scale_rect = title_scale.get_rect(center= (width//2, 100))
 
+back_buttons = pygame.image.load("frame3.png").convert()
+back_buttons_scale = pygame.transform.scale(back_buttons,(width, height))
+back_buttons_scale_rect = back_buttons_scale.get_rect(center= (width//2, height//2))
 ## ---------------- Class Button
 
 class Button:
@@ -121,16 +125,16 @@ while running:
             button.draw_button(screen)
             
     elif actual_screen == "play_screen":
-        screen.fill(black)
+        screen.blit(back_buttons_scale,(0,0))
         screen.blit(text_play,(100,100))
         screen.blit(text_exit,(10,300))
         
     elif actual_screen== "options_screen":
-        screen.fill(black)
+        screen.blit(back_buttons_scale,(0,0))
         screen.blit(text_options,(100,100))
         screen.blit(text_exit,(10,300))
     elif actual_screen == "credits_screen":
-        screen.fill(black)
+        screen.blit(back_buttons_scale,(0,0))
         screen.blit(text_credits,(10,100))
         screen.blit(text_exit,(10,300))
     pygame.display.flip()
