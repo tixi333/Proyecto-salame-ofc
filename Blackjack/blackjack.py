@@ -20,7 +20,7 @@ VALORES = {
 PALOS = ['p', 'c', 'd', 't'] 
 
 ventana = pygame.display.set_mode((ANCHO, ALTO))
-pygame.display.set_caption("Blackjack con Pygame")
+pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 
 cartel_base = pygame.image.load(os.path.join("Blackjack/cartas", "cartel.png"))

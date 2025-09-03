@@ -23,6 +23,7 @@ def pantalla_inicio(pantalla, fuente, fuente_grande):
         linea = fuente.render(texto, True, NEGRO)
         pantalla.blit(linea, (ANCHO // 2 - linea.get_width() // 2, 250 + i * 40))
     pygame.display.flip()
+    pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
     esperando = True
     while esperando:
         for evento in pygame.event.get():
