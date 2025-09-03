@@ -21,6 +21,10 @@ PALOS = ['p', 'c', 'd', 't']
 
 ventana = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Blackjack con Pygame")
+pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
+
+cartel_base = pygame.image.load(os.path.join("Blackjack/cartas", "cartel.png"))
+cartel_base = pygame.transform.scale(cartel_base, (153,90))
 
 def cargar_imagen(nombre):
     ruta = os.path.join(RUTA_CARTAS, nombre + ".png")
@@ -70,8 +74,10 @@ def mostrar_controles():
         "[R] Salir"
         ]
     for i, linea in enumerate(instrucciones):
-        txt=FUENTE.render(linea, True, BLANCO)
-        ventana.blit(txt, (800, 50 + i * 30))
+        y_pos = 50 + i * 75  
+        ventana.blit(cartel_base, (783, y_pos-48)) 
+        txt = FUENTE.render(linea, True, BLANCO)
+        ventana.blit(txt, (800, y_pos - 10))
 
 
 def main():
@@ -138,4 +144,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-# no quiero que sea con mouse, prefiero una mini pantalla constante que muestre lo que puedes hacer (pedir mas, quedarse,etc)
