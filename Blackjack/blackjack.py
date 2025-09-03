@@ -59,16 +59,19 @@ def mostrar_mano(mano, x, y, ocultar_segunda=False):
             imagen = cargar_imagen(carta)
         ventana.blit(imagen, (x + i * 90, y))
 
-def dibujar_boton(texto, x, y, ancho, alto):
-    rect = pygame.Rect(x, y, ancho, alto)
-    pygame.draw.rect(ventana, VERDE, rect)
-    pygame.draw.rect(ventana, NEGRO, rect, 2)
-    texto_render = FUENTE.render(texto, True, BLANCO)
-    ventana.blit(texto_render, (x + 10, y + 10))
-    return rect
 def mostrar_mensaje(texto):
     msg = FUENTE.render(texto, True, NEGRO)
     ventana.blit(msg, (ANCHO//2 - msg.get_width()//2, 20))
+
+def mostrar_controles():
+    instrucciones = [
+        "[P] Pedir carta",
+        "[S] Plantarse",
+        "[R] Salir"
+        ]
+    for i, linea in enumerate(instrucciones):
+        txt=FUENTE.render(linea, True, BLANCO)
+        ventana.blit(txt, (800, 50 + i * 30))
 
 
 def main():
@@ -87,27 +90,34 @@ def main():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif evento.type == pygame.MOUSEBUTTONDOWN and en_juego:
-                if boton_pedir.collidepoint(evento.pos):
-                    jugador.append(baraja.pop())
-                    if calcular_puntos(jugador) > 21:
-                        resultado = "¡Te pasaste! Pierdes."
+
+            elif evento.type == pygame.KEYDOWN:
+                if en_juego:
+                    if evento.key == pygame.K_p:
+                        jugador.append(baraja.pop())
+                        if calcular_puntos(jugador) > 21:
+                            resultado = "¡Te pasaste! Pierdes."
+                            en_juego = False
+
+                    elif evento.key == pygame.K_s:
+                        turno = "dealer"
+                        while calcular_puntos(dealer) < 17:
+                            dealer.append(baraja.pop())
+                        puntos_j = calcular_puntos(jugador)
+                        puntos_d = calcular_puntos(dealer)
+                        if puntos_d > 21 or puntos_j > puntos_d:
+                            resultado = "¡Ganaste!"
+                        elif puntos_j == puntos_d:
+                            resultado = "Empate."
+                        else:
+                            resultado = "Perdiste."
                         en_juego = False
-                elif boton_plantarse.collidepoint(evento.pos):
-                    turno = "dealer"
-                    while calcular_puntos(dealer) < 17:
-                        dealer.append(baraja.pop())
-                    puntos_j = calcular_puntos(jugador)
-                    puntos_d = calcular_puntos(dealer)
-                    if puntos_d > 21 or puntos_j > puntos_d:
-                        resultado = "¡Ganaste!"
-                    elif puntos_j == puntos_d:
-                        resultado = "Empate."
-                    else:
-                        resultado = "Perdiste."
-                    en_juego = False
-            elif evento.type == pygame.MOUSEBUTTONDOWN and not en_juego:
-                main()
+
+                else:
+                    if evento.key == pygame.K_r:
+                        main()  # Reiniciar juego
+
+                        
 
         mostrar_mano(jugador, 50, 400)
         mostrar_mano(dealer, 50, 100, ocultar_segunda=en_juego)
@@ -117,16 +127,15 @@ def main():
         puntos_txt = FUENTE.render(f"Jugador: {puntos_j}    Dealer: {puntos_d}", True, BLANCO)
         ventana.blit(puntos_txt, (50, 300))
 
-        if en_juego:
-            boton_pedir = dibujar_boton("Pedir", 700, 400, 120, 40)
-            boton_plantarse = dibujar_boton("Plantarse", 700, 460, 120, 40)
-        else:
+        if not en_juego:
             mostrar_mensaje(resultado)
-            reinicio = FUENTE.render("Haz clic para reiniciar", True, BLANCO)
+            reinicio = FUENTE.render("Haz [R] para reiniciar", True, BLANCO)
             ventana.blit(reinicio, (ANCHO//2 - reinicio.get_width()//2, 60))
-
+        mostrar_controles()
         pygame.display.flip()
         clock.tick(30)
 
 if __name__ == "__main__":
     main()
+
+# no quiero que sea con mouse, prefiero una mini pantalla constante que muestre lo que puedes hacer (pedir mas, quedarse,etc)
