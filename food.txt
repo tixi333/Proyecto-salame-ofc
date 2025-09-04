@@ -1,49 +1,49 @@
-Apple Pie | 05_apple_pie.png | 35 | 2500
-Bread | 07_bread.png | 60 | 1200
+Pastel de Manzana | 05_apple_pie.png | 35 | 2500
+Pan | 07_bread.png | 60 | 1200
 Baguette | 09_baguette.png | 55 | 1500
-Waffle | 101_waffle.png | 40 | 1800
-Bun | 11_bun.png | 55 | 900
-Bacon | 13_bacon.png | 30 | 2800
-Burger | 15_burger.png | 35 | 3000
+Gofre | 101_waffle.png | 40 | 1800
+Bollo | 11_bun.png | 55 | 900
+Tocino | 13_bacon.png | 30 | 2800
+Hamburguesa | 15_burger.png | 35 | 3000
 Burrito | 18_burrito.png | 45 | 2700
 Bagel | 20_bagel.png | 50 | 1400
-Cheesecake | 22_cheesecake.png | 30 | 3200
-Cheese Puff | 24_cheesepuff.png | 20 | 700
+Tarta de Queso | 22_cheesecake.png | 30 | 3200
+Bocadito de Queso | 24_cheesepuff.png | 20 | 700
 Chocolate | 26_chocolate.png | 25 | 900
-Cookies | 28_cookies.png | 25 | 1200
-Chocolate Cake | 30_chocolatecake.png | 30 | 3300
+Galletas | 28_cookies.png | 25 | 1200
+Pastel de Chocolate | 30_chocolatecake.png | 30 | 3300
 Curry | 32_curry.png | 55 | 3500
-Donut | 34_donut.png | 25 | 1000
+Dona | 34_donut.png | 25 | 1000
 Dumplings | 36_dumplings.png | 60 | 3200
-Fried Egg | 38_friedegg.png | 65 | 700
-Egg Salad | 40_eggsalad.png | 70 | 2500
-Egg Tart | 42_eggtart.png | 35 | 1800
-French Fries | 44_frenchfries.png | 30 | 1500
-Fruit Cake | 46_fruitcake.png | 35 | 3000
-Garlic Bread | 48_garlicbread.png | 50 | 1700
-Giant Gummy Bear | 50_giantgummybear.png | 15 | 900
-Gingerbread Man | 52_gingerbreadman.png | 25 | 1200
+Huevo Frito | 38_friedegg.png | 65 | 700
+Ensalada de Huevo | 40_eggsalad.png | 70 | 2500
+Tarta de Huevo | 42_eggtart.png | 35 | 1800
+Papas Fritas | 44_frenchfries.png | 30 | 1500
+Pastel de Frutas | 46_fruitcake.png | 35 | 3000
+Pan de Ajo | 48_garlicbread.png | 50 | 1700
+Oso de Goma Gigante | 50_giantgummybear.png | 15 | 900
+Muñeco de Jengibre | 52_gingerbreadman.png | 25 | 1200
 Hotdog | 54_hotdog.png | 35 | 2000
-Ice Cream | 57_icecream.png | 25 | 2200
-Jelly | 59_jelly.png | 40 | 800
-Jam | 61_jam.png | 40 | 1000
-Lemon Pie | 63_lemonpie.png | 35 | 2500
-Loaf Bread | 65_loafbread.png | 60 | 1300
-Mac and Cheese | 67_macncheese.png | 40 | 2600
-Meatball | 69_meatball.png | 55 | 3000
+Helado | 57_icecream.png | 25 | 2200
+Gelatina | 59_jelly.png | 40 | 800
+Mermelada | 61_jam.png | 40 | 1000
+Pastel de Limón | 63_lemonpie.png | 35 | 2500
+Pan de Molde | 65_loafbread.png | 60 | 1300
+Macarrones con Queso | 67_macncheese.png | 40 | 2600
+Albóndiga | 69_meatball.png | 55 | 3000
 Nacho | 71_nacho.png | 30 | 1500
-Omelet | 73_omlet.png | 70 | 1800
-Pudding | 75_pudding.png | 30 | 1500
-Potato Chips | 77_potatochips.png | 25 | 1200
-Pancakes | 79_pancakes.png | 40 | 2200
+Tortilla | 73_omlet.png | 70 | 1800
+Pudín | 75_pudding.png | 30 | 1500
+Papas de Bolsa | 77_potatochips.png | 25 | 1200
+Panqueques | 79_pancakes.png | 40 | 2200
 Pizza | 81_pizza.png | 35 | 3500
-Popcorn | 83_popcorn.png | 50 | 1000
-Roasted Chicken | 85_roastedchicken.png | 80 | 6500
+Palomitas | 83_popcorn.png | 50 | 1000
+Pollo Asado | 85_roastedchicken.png | 80 | 6500
 Ramen | 87_ramen.png | 45 | 3000
-Salmon | 88_salmon.png | 85 | 7500
-Strawberry Cake | 90_strawberrycake.png | 35 | 3200
-Sandwich | 92_sandwich.png | 50 | 2000
-Spaghetti | 94_spaghetti.png | 45 | 2800
-Steak | 95_steak.png | 80 | 8500
+Salmón | 88_salmon.png | 85 | 7500
+Pastel de Fresa | 90_strawberrycake.png | 35 | 3200
+Sándwich | 92_sandwich.png | 50 | 2000
+Espaguetis | 94_spaghetti.png | 45 | 2800
+Bistec | 95_steak.png | 80 | 8500
 Sushi | 97_sushi.png | 75 | 5000
 Taco | 99_taco.png | 50 | 2200

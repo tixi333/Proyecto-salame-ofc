@@ -1,4 +1,4 @@
-import pygame
+import pygame, pygame_widgets
 
 #seteo inicial
 pygame.init()
@@ -86,6 +86,23 @@ space = False
 
 salame = salame()
 
+total_lines = 49
+total_pages = 7
+ITEMS_PER_PAGE = 7
+current_page = 0
+def read_page(page):
+    start_line = page * ITEMS_PER_PAGE
+    foods_on_page = []
+    with open("food.txt", "r") as f:
+        for i, line in enumerate(f):
+            if i < start_line:
+                continue
+            if i >= start_line + ITEMS_PER_PAGE:
+                break
+            name, image, health, value = line.strip().split(" | ")
+            foods_on_page.append(food(name, image, int(health), int(value)))
+    return foods_on_page
+
 running = True
 while running:
     for event in pygame.event.get():
@@ -101,9 +118,11 @@ while running:
             elif event.key == pygame.K_b:
                 buymenu = not buymenu
             elif event.key == pygame.K_a:
-                left = not left
+                if buymenu:
+                    current_page = (current_page - 1) % total_pages
             elif event.key == pygame.K_d:
-                right = not right
+                if buymenu:
+                    current_page = (current_page + 1) % total_pages
             
 
     if show_info:
@@ -115,26 +134,19 @@ while running:
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
         screen.blit(info_text, info_rect)
+        
         if backgrounds[index] == BLUE:
             if buymenu:
                 screen.fill(WHITE)
-                with open("food.txt", "r") as f:
-                    height_offset = 0
-                    for line in enumerate(f):
-                        foodinfo = line[1].strip().split(" | ")
-                        current_food = food(foodinfo[0], foodinfo[1], int(foodinfo[2]), int(foodinfo[3]))
-                        current_food.rect = (10, 2 + height_offset)
-                        text = font.render(f"{foodinfo[0]} Valor nutricional: {foodinfo[2]} Precio: {foodinfo[3]}", True, BLACK)
-                        screen.blit(current_food.image, current_food.rect)
-                        screen.blit(text, (100, 22 + height_offset))
-                        height_offset += 85
-                        if index == 7:
-                            if space:
-                                screen.fill(WHITE)
-                                pygame.display.flip()
-                                continue
-                            else:
-                                pygame.event.wait()
+                page_foods = read_page(current_page)
+                height_offset = 0
+                for current_food in page_foods:
+                    current_food.rect = (10, 2 + height_offset)
+                    text = font.render(f"{current_food.name} Salud: {current_food.health} Precio: {current_food.value}", True, BLACK)
+                    screen.blit(current_food.image, current_food.rect)
+                    screen.blit(text, (100, 22 + height_offset))
+                    height_offset += 85
+                
 
             else:
                 screen.blit(arrowright_bottom, arrowright_bottom_rect)
@@ -143,6 +155,7 @@ while running:
             
 
     pygame.display.flip()
+
 
 
 
