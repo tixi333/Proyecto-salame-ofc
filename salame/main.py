@@ -1,4 +1,5 @@
 import pygame, pygame_widgets
+from pygame_widgets.button import Button
 
 #seteo inicial
 pygame.init()
@@ -35,13 +36,20 @@ class food:
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
         self.rect = self.image.get_rect()
-    def draw(self, surface):
-        self.rect.midbottom = (width // 2 , height)
-        surface.blit(self.image, self.rect)
+    def draw(self):
+        self.button = Button(
+            screen,
+            self.rect.x,
+            self.rect.y,
+            self.rect.width,
+            self.rect.height,
+            image=self.image
+        )
     def feed(self):
         salame.health = salame.health + self.health
         if salame.health > 100:
             salame.health = 100
+
 
 
 
@@ -90,6 +98,7 @@ total_lines = 49
 total_pages = 7
 ITEMS_PER_PAGE = 7
 current_page = 0
+last_page = 0
 def read_page(page):
     start_line = page * ITEMS_PER_PAGE
     foods_on_page = []
@@ -102,7 +111,11 @@ def read_page(page):
             name, image, health, value = line.strip().split(" | ")
             foods_on_page.append(food(name, image, int(health), int(value)))
     return foods_on_page
-
+    
+def clear_buttons(buttons):
+    for i in buttons:
+        i = None
+    buttons.clear()
 running = True
 while running:
     for event in pygame.event.get():
@@ -140,21 +153,26 @@ while running:
                 screen.fill(WHITE)
                 page_foods = read_page(current_page)
                 height_offset = 0
-                for current_food in page_foods:
-                    current_food.rect = (10, 2 + height_offset)
-                    text = font.render(f"{current_food.name} Salud: {current_food.health} Precio: {current_food.value}", True, BLACK)
-                    screen.blit(current_food.image, current_food.rect)
-                    screen.blit(text, (100, 22 + height_offset))
-                    height_offset += 85
-                
+                if current_page == last_page:
+                    for current_food in page_foods:
+                        current_food.rect.topleft = (10, 2 + height_offset)
+                        text = font.render(f"{current_food.name} Salud: {current_food.health} Precio: {current_food.value}", True, BLACK)
+                        current_food.draw()
+                        screen.blit(text, (100, 22 + height_offset))
+                        height_offset += 85
+                else:
+                    clear_buttons(page_foods)
+                last_page = current_page
 
             else:
+
                 screen.blit(arrowright_bottom, arrowright_bottom_rect)
                 screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
 
-            
 
-    pygame.display.flip()
+            
+    pygame_widgets.update(event)
+    pygame.display.update()
 
 
 
