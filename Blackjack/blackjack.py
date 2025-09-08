@@ -21,11 +21,16 @@ PALOS = ['p', 'c', 'd', 't']
 
 personaje_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio.png"))
 personaje_img = pygame.transform.scale(personaje_img, (200, 200))
+personaje_triste_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio_triste.png"))
+personaje_triste_img = pygame.transform.scale(personaje_triste_img, (200, 200))
 
 def mostrar_personaje_dialogo(mensaje):
     personaje_x = ANCHO - 350  
     personaje_y = ALTO - 250   
-    ventana.blit(personaje_img, (personaje_x, personaje_y))
+    if "salame" in mensaje or "Perdiste" in mensaje:
+        ventana.blit(personaje_triste_img, (personaje_x, personaje_y))
+    else:
+        ventana.blit(personaje_img, (personaje_x, personaje_y))
 
     
     fuente_grande = pygame.font.SysFont("arial", 28, bold=True)
