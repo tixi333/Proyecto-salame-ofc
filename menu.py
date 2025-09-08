@@ -11,11 +11,13 @@ pygame.display.set_caption("Cuida a tu salame")
 black = (0,0,0)
 white = (255,255,255) 
 grey = (128,128,128)
+font = pygame.font.Font("monogram-extended.ttf", 100) 
+
 font = pygame.font.Font("monogram-extended.ttf", 50) 
 text_play = font.render("play screen", True, grey)
 text_options = font.render("options screen", True, grey)
-text_credits = font.render("credits screen", True, grey)
 
+text_exit = font.render("ESC go back to menu", True, grey)
 text_exit = font.render("ESC - (go back)", True, grey)
 
 back = pygame.image.load("menu.jpg").convert()
@@ -134,12 +136,12 @@ while running:
     elif actual_screen == "play_screen":
         screen.blit(back_buttons_scale,(0,0))
         screen.blit(text_play,(100,100))
-        screen.blit(text_exit,(10,300))
+        screen.blit(text_exit,(300,500))
         
     elif actual_screen== "options_screen":
         screen.blit(back_buttons_scale,(0,0))
         screen.blit(text_options,(100,100))
-        screen.blit(text_exit,(10,300))
+        screen.blit(text_exit,(300,500))
     elif actual_screen == "credits_screen":
         screen.blit(back_buttons_scale,(0,0))
         screen.blit(t_credits1, (250,100))
