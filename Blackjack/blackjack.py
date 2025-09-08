@@ -19,6 +19,22 @@ VALORES = {
 }
 PALOS = ['p', 'c', 'd', 't'] 
 
+personaje_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio.png"))
+personaje_img = pygame.transform.scale(personaje_img, (120, 120))
+
+def mostrar_personaje_dialogo():
+    x = ANCHO - 140
+    y = ALTO - 140
+    ventana.blit(personaje_img, (x, y))
+
+    texto = "¿Qué quieres hacer?"
+    burbuja = FUENTE.render(texto, True, NEGRO)
+    burbuja_fondo = pygame.Surface((burbuja.get_width() + 20, burbuja.get_height() + 10))
+    burbuja_fondo.fill(BLANCO)
+    ventana.blit(burbuja_fondo, (x - burbuja.get_width() - 30, y + 20))
+    ventana.blit(burbuja, (x - burbuja.get_width() - 20, y + 25))
+
+
 ventana = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
@@ -138,9 +154,9 @@ def main():
             reinicio = FUENTE.render("Haz [R] para reiniciar", True, BLANCO)
             ventana.blit(reinicio, (ANCHO//2 - reinicio.get_width()//2, 60))
         mostrar_controles()
+        mostrar_personaje_dialogo()
         pygame.display.flip()
         clock.tick(30)
 
 if __name__ == "__main__":
     main()
-
