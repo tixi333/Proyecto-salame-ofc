@@ -98,7 +98,7 @@ while running:
 
     elif actual_screen == "menu_screen":
         screen.fill(grey)
-        screen.blit(tri_scale, (0,0))
+        screen.blit(zero_scale, (0,0))
     pygame.display.flip()
 
 pygame.quit()
