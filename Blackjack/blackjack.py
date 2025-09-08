@@ -160,19 +160,20 @@ def main():
             reinicio = FUENTE.render("Haz [R] para reiniciar", True, BLANCO)
             ventana.blit(reinicio, (ANCHO//2 - reinicio.get_width()//2, 60))
         mostrar_controles()
+
         if en_juego:
-                mensaje_personaje = "¿Qué quieres hacer?"
+            mensaje_personaje = "¿Qué quieres hacer?"
         else:
             if resultado == "¡Ganaste!":
-                mensaje_personaje = "¡Ganaste!"
+                mensaje_personaje = "¡Bien!"
             elif resultado == "Empate.":
-                mensaje_personaje = "Empate... Bueno, no está mal."
+                mensaje_personaje = "Okay... no está mal."
             elif resultado == "Perdiste.":
                 mensaje_personaje = "Perdiste... sos un salame."
             else:
                 mensaje_personaje = "Fin del juego."
 
-            mostrar_personaje_dialogo(mensaje_personaje)
+        mostrar_personaje_dialogo(mensaje_personaje)
 
         pygame.display.flip()
         clock.tick(30)
