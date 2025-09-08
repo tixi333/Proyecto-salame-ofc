@@ -21,11 +21,16 @@ PALOS = ['p', 'c', 'd', 't']
 
 personaje_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio.png"))
 personaje_img = pygame.transform.scale(personaje_img, (200, 200))
+personaje_triste_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio_triste.png"))
+personaje_triste_img = pygame.transform.scale(personaje_triste_img, (200, 200))
 
 def mostrar_personaje_dialogo(mensaje):
     personaje_x = ANCHO - 350  
     personaje_y = ALTO - 250   
-    ventana.blit(personaje_img, (personaje_x, personaje_y))
+    if "salame" in mensaje or "Perdiste" in mensaje:
+        ventana.blit(personaje_triste_img, (personaje_x, personaje_y))
+    else:
+        ventana.blit(personaje_img, (personaje_x, personaje_y))
 
     
     fuente_grande = pygame.font.SysFont("arial", 28, bold=True)
@@ -160,19 +165,20 @@ def main():
             reinicio = FUENTE.render("Haz [R] para reiniciar", True, BLANCO)
             ventana.blit(reinicio, (ANCHO//2 - reinicio.get_width()//2, 60))
         mostrar_controles()
+
         if en_juego:
-                mensaje_personaje = "¿Qué quieres hacer?"
+            mensaje_personaje = "¿Qué quieres hacer?"
         else:
             if resultado == "¡Ganaste!":
-                mensaje_personaje = "¡Ganaste!"
+                mensaje_personaje = "¡Bien!"
             elif resultado == "Empate.":
-                mensaje_personaje = "Empate... Bueno, no está mal."
+                mensaje_personaje = "Okay... no está mal."
             elif resultado == "Perdiste.":
                 mensaje_personaje = "Perdiste... sos un salame."
             else:
                 mensaje_personaje = "Fin del juego."
 
-            mostrar_personaje_dialogo(mensaje_personaje)
+        mostrar_personaje_dialogo(mensaje_personaje)
 
         pygame.display.flip()
         clock.tick(30)
