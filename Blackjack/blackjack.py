@@ -19,6 +19,30 @@ VALORES = {
 }
 PALOS = ['p', 'c', 'd', 't'] 
 
+personaje_img = pygame.image.load(os.path.join(RUTA_CARTAS, "salame_monio.png"))
+personaje_img = pygame.transform.scale(personaje_img, (200, 200))
+
+def mostrar_personaje_dialogo(mensaje):
+    personaje_x = ANCHO - 350  
+    personaje_y = ALTO - 250   
+    ventana.blit(personaje_img, (personaje_x, personaje_y))
+
+    
+    fuente_grande = pygame.font.SysFont("arial", 28, bold=True)
+    texto = fuente_grande.render(mensaje, True, NEGRO)
+
+    padding = 20
+    burbuja_ancho = texto.get_width() + padding
+    burbuja_alto = texto.get_height() + padding
+    burbuja = pygame.Surface((burbuja_ancho, burbuja_alto))
+    burbuja.fill(BLANCO)
+
+    burbuja_x = personaje_x - burbuja_ancho - 20
+    burbuja_y = personaje_y + 60
+    ventana.blit(burbuja, (burbuja_x, burbuja_y))
+    ventana.blit(texto, (burbuja_x + 10, burbuja_y + 10))
+
+
 ventana = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
@@ -121,10 +145,8 @@ def main():
 
                 else:
                     if evento.key == pygame.K_r:
-                        main()  # Reiniciar juego
-
+                        main()
                         
-
         mostrar_mano(jugador, 50, 400)
         mostrar_mano(dealer, 50, 100, ocultar_segunda=en_juego)
 
@@ -138,9 +160,22 @@ def main():
             reinicio = FUENTE.render("Haz [R] para reiniciar", True, BLANCO)
             ventana.blit(reinicio, (ANCHO//2 - reinicio.get_width()//2, 60))
         mostrar_controles()
+        if en_juego:
+                mensaje_personaje = "¿Qué quieres hacer?"
+        else:
+            if resultado == "¡Ganaste!":
+                mensaje_personaje = "¡Ganaste!"
+            elif resultado == "Empate.":
+                mensaje_personaje = "Empate... Bueno, no está mal."
+            elif resultado == "Perdiste.":
+                mensaje_personaje = "Perdiste... sos un salame."
+            else:
+                mensaje_personaje = "Fin del juego."
+
+            mostrar_personaje_dialogo(mensaje_personaje)
+
         pygame.display.flip()
         clock.tick(30)
 
 if __name__ == "__main__":
     main()
-
