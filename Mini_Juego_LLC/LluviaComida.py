@@ -58,7 +58,7 @@ def guardar_record(puntaje, ruta="Mini_Juego_LLC/record.txt"):
 
 def cargar_imagenes():
     jugador_img = pygame.image.load('Mini_juego_LLC/imagenes/salame.png').convert_alpha()
-    jugador_img = pygame.transform.scale(jugador_img, (75, 75))
+    jugador_img = pygame.transform.scale(jugador_img, (50, 50))
     comidas_imgs = [
         pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/imagenes/comida{i+1}.png").convert_alpha(), (40, 40))
         for i in range(4)
