@@ -9,7 +9,7 @@ ANCHO, ALTO = 1000, 600
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
 VERDE = (0, 128, 0)
-FUENTE = pygame.font.SysFont("arial", 24)
+FUENTE = pygame.font.Font("monogram-extended.ttf", 40)
 RUTA_CARTAS = "Blackjack/cartas"
 
 VALORES = {
@@ -33,7 +33,7 @@ def mostrar_personaje_dialogo(mensaje):
         ventana.blit(personaje_img, (personaje_x, personaje_y))
 
     
-    fuente_grande = pygame.font.SysFont("arial", 28, bold=True)
+    fuente_grande = pygame.font.Font("monogram-extended.ttf", 40) 
     texto = fuente_grande.render(mensaje, True, NEGRO)
 
     padding = 20
@@ -106,7 +106,7 @@ def mostrar_controles():
         y_pos = 50 + i * 75  
         ventana.blit(cartel_base, (783, y_pos-48)) 
         txt = FUENTE.render(linea, True, BLANCO)
-        ventana.blit(txt, (800, y_pos - 10))
+        ventana.blit(txt, (700, y_pos - 10))
 
 
 def main():
