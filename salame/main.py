@@ -1,22 +1,30 @@
-import pygame, pygame_widgets
+import pygame
+import pygame_widgets
 from pygame_widgets.button import Button
 
-#seteo inicial
+# seteo inicial
 pygame.init()
 
 width = 800
 height = 600
-screen = pygame.display.set_mode((width, height)) #seteo tamaño pantalla
-#colores
-WHITE=(245,246,252); BLACK=(30,30,35); GRAY=(100,105,115)
-GREEN=(70,190,120); RED=(230,90,90); BLUE=(90,150,240)
-YELLOW=(245,210,80); PURPLE=(160,120,220); DARK=(24,26,32)
-ACCENT=(90,200,255)
+screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
+# colores
+WHITE = (245, 246, 252)
+BLACK = (30, 30, 35)
+GRAY = (100, 105, 115)
+GREEN = (70, 190, 120)
+RED = (230, 90, 90)
+BLUE = (90, 150, 240)
+YELLOW = (245, 210, 80)
+PURPLE = (160, 120, 220)
+DARK = (24, 26, 32)
+ACCENT = (90, 200, 255)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
 
-#clases salame y comida
+# clases salame y comida
+
 
 class salame:
     def __init__(self):
@@ -26,8 +34,10 @@ class salame:
         self.image = pygame.transform.scale(self.image, (400, 400))
         self.rect = self.image.get_rect()
         self.rect.center = (width // 2, height // 2)
+
     def draw(self, surface):
         surface.blit(self.image, self.rect)
+
 
 class food:
     def __init__(self, name, image_path, health, value):
@@ -37,6 +47,7 @@ class food:
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
         self.rect = self.image.get_rect()
+
     def draw(self):
         if not hasattr(self, 'button'):
             self.button = Button(
@@ -46,32 +57,45 @@ class food:
                 self.rect.width,
                 self.rect.height,
                 image=self.image,
-                onClick=self.feed_or_buy     
+                onClick=self.feed_or_buy
             )
         else:
             self.button.show()
+
     def feed_or_buy(self):
+        global button_flag, button_flag_type, bought_food, salame, buymenu
         if buymenu:
             with open("money.txt", "r") as f:
                 money = int(f.read().strip())
             if money >= self.value:
-                money -= self.value
-                with open("money.txt", "w") as f:
-                    f.write(str(money))
-                with open("food_bought.txt", "a") as f:
-                    f.write(f"{self.name} | {self.image} | {self.health} | {self.value}\n")
+                if len(bought_food) < 10:
+                    money -= self.value
+                    with open("money.txt", "w") as f:
+                        f.write(str(money))
+                    with open("food_bought.txt", "a") as f:
+                        f.write(f"{self.name} | {self.image} | {self.health} | {self.value}\n")
+                    bought_food.append(self)
+                else:
+                    button_flag = True
+                    button_flag_type = "max food"
             else:
-                no_money_flag == True
-
-        elif current_background == BLUE:    
+                button_flag = True
+                button_flag_type = "no money"
+    
+        elif current_background == BLUE:
             salame.health = salame.health + self.health
             if salame.health > 100:
                 salame.health = 100
+            bought_food.remove(self)
+            with open("food_bought.txt", "w") as f:
+                for item in bought_food:
+                    f.write(f"{item.name} | {item.image} | {item.health} | {item.value}\n")
+
     def hide(self):
         self.button.hide()
-       
 
-#flechas generales de todos los back (salvo los flags)
+
+# flechas generales de todos los back (salvo los flags)
 arrowright = pygame.image.load("arrowright.png").convert_alpha()
 arrowright = pygame.transform.scale(arrowright, (100, 100))
 arrowright_back_rect = arrowright.get_rect()
@@ -83,18 +107,18 @@ arrowleft_back_rect = arrowleft.get_rect()
 arrowleft_back_rect.center = (width // 2, height // 2)
 arrowleft_back_rect.right = arrowleft_back_rect.left - 200
 
-#flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
+# flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
 arrowleft_bottom = pygame.transform.scale(arrowleft, (40, 40))
 arrowleft_bottom_rect = arrowleft_bottom.get_rect()
-arrowleft_bottom_rect.midbottom = (width // 2 - 150, height)
+arrowleft_bottom_rect.midbottom = (width // 2 - 100, height)
 arrowright_bottom = pygame.transform.scale(arrowright, (40, 40))
 arrowright_bottom_rect = arrowright_bottom.get_rect()
-arrowright_bottom_rect.midbottom = (width // 2 + 150, height)
+arrowright_bottom_rect.midbottom = (width // 2 + 100, height)
 no_food_text = font.render("No tienes comida comprada", True, BLACK)
 no_food_rect = no_food_text.get_rect()
-no_food_rect.midbottom = (width // 2, height) 
+no_food_rect.midbottom = (width // 2, height)
 
-#todo lo de info
+# todo lo de info
 info_text = font.render("Presiona <i> para info", True, BLACK)
 info_rect = info_text.get_rect()
 info_rect.midtop = (width // 2, 0)
@@ -103,40 +127,67 @@ i_rect = i_text.get_rect()
 i_rect.center = (width // 2, height // 2)
 
 
-#para manejar fondos
+# para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
 index = 0
 
-#flags
+# flags y similares
 show_info = False
 buymenu = False
-no_money_flag = False
 
-
-
-#para manejar la comida comprada
+# para manejar la comida comprada
 food_index = 0
 bought_food = []
 
 
-#instancia salame
+# instancia salame
 salame = salame()
 
-#para poder manejar los botones
+# para poder manejar los botones
 buttons = []
+button_flag = False
+button_flag_type = ""
+button = None
+
+def flag_button(text):
+    global button
+    button = Button(
+                screen,
+                width // 2 - 100,
+                height // 2 - 25,
+                400,
+                50,
+                text=text,
+                font = font,
+                fontSize=30,
+                margin=10,
+                inactiveColour=PURPLE,
+                hoverColour=ACCENT,
+                pressedColour=RED,
+                onClick=kill_button_flag
+                )
+def kill_button_flag():
+    global button_flag, button
+    if button_flag:
+        button.hide()
+        button = None
+    button_flag = False
+    
+
+
 def clear_buttons():
     for i in buttons:
         for widget in i:
             widget.hide()
         buttons.clear()
-        
-#esto es para definir items por página del menú de compra
+
+
+# esto es para definir items por página del menú de compra
 total_lines = 49
 total_pages = 7
 ITEMS_PER_PAGE = 7
 current_page = 0
 last_page = 0
-
 
 
 def read_page(page):
@@ -151,7 +202,6 @@ def read_page(page):
             name, image, health, value = line.strip().split(" | ")
             foods_on_page.append(food(name, image, int(health), int(value)))
     return foods_on_page
-
 
 
 running = True
@@ -173,14 +223,14 @@ while running:
                 if buymenu:
                     current_page = (current_page - 1) % total_pages
                 elif backgrounds[index] == BLUE:
-                    food_index = (food_index - 1) % len(bought_food) 
+                    food_index = (food_index - 1) % len(bought_food)
             elif event.key == pygame.K_d:
                 if buymenu:
                     current_page = (current_page + 1) % total_pages
                 elif backgrounds[index] == BLUE:
-                    food_index = (food_index + 1) % len(bought_food) 
+                    food_index = (food_index + 1) % len(bought_food)
 
-    current_background = backgrounds[index]        
+    current_background = backgrounds[index]
 
     if show_info:
         screen.fill(WHITE)
@@ -191,7 +241,7 @@ while running:
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
         screen.blit(info_text, info_rect)
-        
+
         if current_background == BLUE:
             if buymenu:
                 screen.fill(WHITE)
@@ -204,22 +254,12 @@ while running:
                     current_food.draw()
                     screen.blit(text, (100, 22 + height_offset))
                     height_offset += 85
-                if no_money_flag:
-                    no_money = Button(
-                    screen,
-                    width // 2 - 100,
-                    height // 2 - 25,
-                    300,
-                    50,
-                    text="No tienes dinero",
-                    fontSize=30,
-                    margin=10,
-                    inactiveColour=RED,
-                    hoverColour=ACCENT,
-                    pressedColour=DARK,
-                    onClick=lambda: globals().update(no_money_flag=False)
-                    )
-                    buttons.append([no_money])         
+                if button_flag:
+                    if button is None:
+                        if button_flag_type == "no money":
+                            flag_button("No tienes suficiente dinero")
+                        elif button_flag_type == "max food":
+                            flag_button("No puedes comprar más comida")
             else:
                 with open("food_bought.txt", "r") as f:
                     for i in f:
@@ -228,17 +268,11 @@ while running:
                 if bought_food:
                     screen.blit(arrowright_bottom, arrowright_bottom_rect)
                     screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
-                    bought_food[food_index].rect.midbottom = (width // 2, height)          
+                    bought_food[food_index].rect.midbottom = (width // 2, height)
                     buttons.append([bought_food[food_index]])
                     bought_food[food_index].draw()
                 else:
                     screen.blit(no_food_text, no_food_rect)
-                    
-            
+
     pygame_widgets.update(event)
     pygame.display.update()
-    
-
-
-
-
