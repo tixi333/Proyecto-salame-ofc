@@ -28,8 +28,6 @@ class salame:
         self.rect.center = (width // 2, height // 2)
     def draw(self, surface):
         surface.blit(self.image, self.rect)
-    def hide(self):
-        self.button.hide()
 
 class food:
     def __init__(self, name, image_path, health, value):
@@ -61,7 +59,10 @@ class food:
                 with open("money.txt", "w") as f:
                     f.write(str(money))
                 with open("food_bought.txt", "a") as f:
-                    f.write(f"{self.name} | {self.image} | {self.health} | {self.value}\n")             
+                    f.write(f"{self.name} | {self.image} | {self.health} | {self.value}\n")
+            else:
+                no_money_flag == True
+
         elif current_background == BLUE:    
             salame.health = salame.health + self.health
             if salame.health > 100:
@@ -83,7 +84,7 @@ arrowleft_back_rect.center = (width // 2, height // 2)
 arrowleft_back_rect.right = arrowleft_back_rect.left - 200
 
 #flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
-arrowleft_bottom = pygame.transform.scale(arrowright, (40, 40))
+arrowleft_bottom = pygame.transform.scale(arrowleft, (40, 40))
 arrowleft_bottom_rect = arrowleft_bottom.get_rect()
 arrowleft_bottom_rect.midbottom = (width // 2 - 150, height)
 arrowright_bottom = pygame.transform.scale(arrowright, (40, 40))
@@ -100,23 +101,23 @@ info_rect.midtop = (width // 2, 0)
 i_text = font.render("iahygfjhjsgjhb", True, BLACK)
 i_rect = i_text.get_rect()
 i_rect.center = (width // 2, height // 2)
-show_info = False
+
 
 #para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
-current_background = 0
-last_background = 0
 index = 0
 
 #flags
+show_info = False
 buymenu = False
-left = False
-right = False
-space = False
+no_money_flag = False
+
+
 
 #para manejar la comida comprada
 food_index = 0
 bought_food = []
+
 
 #instancia salame
 salame = salame()
@@ -203,6 +204,22 @@ while running:
                     current_food.draw()
                     screen.blit(text, (100, 22 + height_offset))
                     height_offset += 85
+                if no_money_flag:
+                    no_money = Button(
+                    screen,
+                    width // 2 - 100,
+                    height // 2 - 25,
+                    300,
+                    50,
+                    text="No tienes dinero",
+                    fontSize=30,
+                    margin=10,
+                    inactiveColour=RED,
+                    hoverColour=ACCENT,
+                    pressedColour=DARK,
+                    onClick=lambda: globals().update(no_money_flag=False)
+                    )
+                    buttons.append([no_money])         
             else:
                 with open("food_bought.txt", "r") as f:
                     for i in f:
