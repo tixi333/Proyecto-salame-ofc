@@ -8,9 +8,10 @@ NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
 FPS = 60
 
-def pantalla_inicio(pantalla, fuente, fuente_grande):
+
+def pantalla_inicio(pantalla, FUENTE):
     pantalla.fill(BLANCO)
-    titulo = fuente_grande.render("¡LLuvia de comida!", True, ROJO)
+    titulo = FUENTE.render("¡LLuvia de comida!", True, ROJO)
     pantalla.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 150))
     instrucciones = [
         "Mueve con las flechas ← →",
@@ -20,7 +21,7 @@ def pantalla_inicio(pantalla, fuente, fuente_grande):
         "Presiona cualquier tecla para comenzar"
     ]
     for i, texto in enumerate(instrucciones):
-        linea = fuente.render(texto, True, NEGRO)
+        linea = FUENTE.render(texto, True, NEGRO)
         pantalla.blit(linea, (ANCHO // 2 - linea.get_width() // 2, 250 + i * 40))
     pygame.display.flip()
     pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
@@ -36,11 +37,10 @@ def pantalla_inicio(pantalla, fuente, fuente_grande):
 def inicializar():
     pygame.init()
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
+    fuente= pygame.font.Font("monogram-extended.ttf", 40)
     pygame.display.set_caption("Salame")
-    fuente = pygame.font.SysFont("Arial", 30)
-    fuente_grande = pygame.font.SysFont("Arial", 60)
     clock = pygame.time.Clock()
-    return pantalla, fuente, fuente_grande, clock
+    return pantalla, fuente, fuente, clock
 def cargar_record(ruta="Mini_Juego_LLC/record.txt"):
     try:
         with open(ruta, "r") as archivo:
@@ -81,8 +81,8 @@ def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
     suelo = pygame.Rect(0, ALTO - 50, ANCHO, 50)
     return jugador_rect, comidas, comida_mala_rect, suelo
 
-def mostrar_texto_centrado(texto, fuente, color, pantalla, offset_y=0):
-    texto_surface = fuente.render(texto, True, color)
+def mostrar_texto_centrado(texto, FUENTE, color, pantalla, offset_y=0):
+    texto_surface = FUENTE.render(texto, True, color)
     rect = texto_surface.get_rect(center=(ANCHO//2, ALTO//2 + offset_y))
     pantalla.blit(texto_surface, rect)
 
@@ -191,7 +191,7 @@ def main():
     pantalla, fuente, fuente_grande, clock = inicializar()
     jugador_img, comidas_imgs, comida_mala_img = cargar_imagenes()
     jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
-    pantalla_inicio(pantalla, fuente, fuente_grande)
+    pantalla_inicio(pantalla, fuente)
     velocidad_y = 0
     gravedad = 0.5
     salto = -10
