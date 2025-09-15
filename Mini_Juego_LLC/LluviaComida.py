@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import time
 
 ANCHO, ALTO = 800, 600
 BLANCO = (255, 255, 255)
@@ -74,7 +75,8 @@ def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
         x = random.randint(0, ANCHO - 40)
         y = random.randint(-600, -40)
         rect = img.get_rect(topleft=(x, y))
-        comidas.append((img, rect))
+        delay = random.randint(0, 60)  # frames de delay inicial
+        comidas.append((img, rect, delay))
     x = random.randint(0, ANCHO - 40)
     y = random.randint(-600, -40)
     comida_mala_rect = comida_mala_img.get_rect(topleft=(x, y))
@@ -89,10 +91,11 @@ def mostrar_texto_centrado(texto, FUENTE, color, pantalla, offset_y=0):
 def reiniciar(jugador_rect, comidas, comida_mala_rect):
     jugador_rect.topleft = (100, 100)
     for i in range(len(comidas)):
-        img, rect = comidas[i]
+        img, rect, _ = comidas[i]
         rect.x = random.randint(0, ANCHO - 40)
         rect.y = random.randint(-600, -40)
-        comidas[i] = (img, rect)
+        delay = random.randint(0, 120)
+        comidas[i] = (img, rect, delay)
     comida_mala_rect.x = random.randint(0, ANCHO - 40)
     comida_mala_rect.y = random.randint(-600, -40)
     return jugador_rect, comidas, comida_mala_rect
@@ -140,20 +143,36 @@ def actualizar_jugador(teclas, jugador_rect, velocidad_y, en_suelo, salto, grave
 
     return jugador_rect, velocidad_y, en_suelo
 
+def sumar_moneda():
+    ruta = "money.txt"
+    try:
+        with open(ruta, "r") as f:
+            monedas = int(f.read())
+    except (FileNotFoundError, ValueError):
+        monedas = 0
+    monedas += 5
+    with open(ruta, "w") as f:
+        f.write(str(monedas))
+
 def actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas):
     for i in range(len(comidas)):
-        img, rect = comidas[i]
-        rect.y += velocidad_comida
+        img, rect, delay = comidas[i]
+        if delay > 0:
+            delay -= 1
+        else:
+            rect.y += velocidad_comida
         if rect.top > ALTO:
             rect.x = random.randint(0, ANCHO - 40)
             rect.y = random.randint(-600, -40)
-            vidas-=1
-        if rect.colliderect(jugador_rect):
+            delay = random.randint(0, 120)
+            vidas -= 1
+        if rect.colliderect(jugador_rect) and delay == 0:
             puntaje += 1
+            sumar_moneda()
             rect.x = random.randint(0, ANCHO - 40)
             rect.y = random.randint(-600, -40)
-        comidas[i] = (img, rect)
-
+            delay = random.randint(0, 120)
+        comidas[i] = (img, rect, delay)
     return comidas, puntaje, vidas
 
 def actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas):
@@ -171,7 +190,7 @@ def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img
     pantalla.fill(BLANCO)
     pantalla.blit(jugador_img, jugador_rect)
     pygame.draw.rect(pantalla, (0, 200, 0), suelo)
-    for img, rect in comidas:
+    for img, rect, _ in comidas:
         pantalla.blit(img, rect)
     pantalla.blit(comida_mala_img, comida_mala_rect)
     texto_record=fuente.render(f"Record: {record}", True, NEGRO)
