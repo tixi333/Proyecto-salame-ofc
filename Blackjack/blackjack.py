@@ -104,7 +104,7 @@ def mostrar_controles():
         ]
     for i, linea in enumerate(instrucciones):
         y_pos = 50 + i * 75  
-        ventana.blit(cartel_base, (783, y_pos-48)) 
+        ventana.blit(cartel_base, (699, y_pos-48)) 
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
