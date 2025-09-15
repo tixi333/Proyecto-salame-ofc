@@ -108,7 +108,6 @@ def mostrar_controles():
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
-
 def main():
     clock = pygame.time.Clock()
     baraja = crear_baraja()
