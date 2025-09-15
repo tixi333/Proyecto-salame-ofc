@@ -150,7 +150,7 @@ def sumar_moneda():
             monedas = int(f.read())
     except (FileNotFoundError, ValueError):
         monedas = 0
-    monedas += 1
+    monedas += 5
     with open(ruta, "w") as f:
         f.write(str(monedas))
 
