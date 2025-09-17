@@ -26,9 +26,14 @@ text_play = font.render("Play", True, grey)
 #------------------ options screen text 
 text_options = font.render("Options", True, grey)
 
-text_easy_d = font.render("Easy mode description", True, grey)
-text_normal_d = font.render("Normal mode description", True, grey)
-text_hard_d = font.render("Hard mode description", True, grey)
+text_easy_d2 = font.render("Easy mode description", True, grey)
+text_normal_d2 = font.render("Normal mode description", True, grey)
+text_hard_d2 = font.render("Hard mode description", True, grey)
+
+text_easy_d = font.render("Easy mode description", True, red)
+text_normal_d = font.render("Normal mode description", True, red)
+text_hard_d = font.render("Hard mode description", True, red)
+
 text_volumen = font.render("Volumen",True, grey)
 text_options_difficulty = font.render("Modo de dificultad",True,grey)
 
@@ -48,15 +53,15 @@ text_how2play2 = font2.render("How to play", True, grey)
 
 #------------------ difficulty buttons
 
-text_select= font2.render("Select difficulty", True, grey)
-text_easy = font2.render("Easy", True, red)
-text_easy2 = font2.render("Easy", True, grey)
+text_select= font.render("Select difficulty", True, grey)
+text_easy = font.render("Easy", True, red)
+text_easy2 = font.render("Easy", True, grey)
 
-text_normal = font2.render("Normal", True, red)
-text_normal2 = font2.render("Normal", True, grey)
+text_normal = font.render("Normal", True, red)
+text_normal2 = font.render("Normal", True, grey)
 
-text_hard = font2.render("Hard", True, red)
-text_hard2 = font2.render("Hard", True, grey)
+text_hard = font.render("Hard", True, red)
+text_hard2 = font.render("Hard", True, grey)
 
 # ------------------- load images background gif ----------------------
 zero = pygame.image.load("0.png").convert()
@@ -135,7 +140,7 @@ nineteen_scale = pygame.transform.scale(nineteen,(width,height))
 
 # ---------------------------
 class Button:
-    def __init__(self,image1,image2,x,y,action):
+    def __init__(self,image1,image2,x,y,action,):
         self.image1 = image1
         self.image2 = image2
         self.image = self.image1
@@ -144,6 +149,8 @@ class Button:
         self.action = action
         self.rect = self.image1.get_rect(center = (self.x,self.y))
         self.hovered= False
+        self.color1 = color1
+        self.color = color2
 
     def draw_button(self, surface):
         surface.blit(self.image, self.rect)
@@ -163,6 +170,8 @@ class Button:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 self.action()
+                
+
 
 #---------- functions
 
@@ -190,6 +199,10 @@ def show_options_hard():
     global actual_screen
     actual_screen == "hard_mode_screen"
 
+def show_current_difficulty(difficulty):
+    global current_difficulty
+    current_difficulty = difficulty
+
 #----------- button
 buttons_menu = [
     Button(text_play,text_play2,90,250, show_play_screen),
@@ -198,9 +211,12 @@ buttons_menu = [
     ]
 
 buttons_options = [
-    Button(text_easy,text_easy2,100,250, show_options_easy),
-    Button(text_normal,text_normal2,130,300, show_options_normal),
-    Button(text_hard,text_hard2,100,350, show_options_hard)   
+    Button(text_easy,text_easy2,60,265, show_current_difficulty("easy")),
+    Button(text_normal,text_normal2,60,315, show_current_difficulty("normal")),
+    Button(text_hard,text_hard2,60,365, show_current_difficulty("hard")),
+    Button(text_easy_d,text_easy_d2,400,265, show_options_easy),
+    Button(text_normal_d,text_normal_d2,400,315, show_options_normal),
+    Button(text_hard_d,text_hard_d2,400,365, show_options_hard),
     ]
 
     #Button(hard1_scale,hard2_scale, width//2,400, show_options_mode)
@@ -247,7 +263,9 @@ while running:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "menu_screen"
             for button in buttons_options:
-                    button.handle_event(event)
+                b_selected = False
+
+                button.handle_event(event)
 
         elif actual_screen == "how2play_screen":
             if event.type == pygame.KEYDOWN:
@@ -294,12 +312,13 @@ while running:
         screen.blit(text_play,(0,0))
     elif actual_screen == "options_screen":   #screen
         screen.fill(black)
-        screen.blit(text_options_difficulty, (100,200))
-        screen.blit(text_volumen, (100,250))
-        screen.blit(text_options, (100,300))
-        screen.blit(text_easy_d, (100,350))
-        screen.blit(text_normal_d, (100,400))
-        screen.blit(text_hard_d, (100,450))
+        screen.blit(text_options_difficulty, (50,200))
+        screen.blit(text_volumen, (50,100))
+        screen.blit(text_options, (200,20))
+
+        pygame.draw.line(screen, grey, (50,150), (700,150), 2)
+        pygame.draw.line(screen, grey, (50,240), (700,240), 2)
+        pygame.draw.line(screen, grey, (50,400), (700,400), 2)
 
         for button in buttons_options:
             button.draw_button(screen)
