@@ -43,6 +43,21 @@ text_play2 = font2.render("Play", True, grey)
 text_options = font2.render("Options", True, red)
 text_options2 = font2.render("Options", True, grey)
 
+text_how2play = font2.render("How to play", True, red)
+text_how2play2 = font2.render("How to play", True, grey)
+
+#------------------ difficulty buttons
+
+text_select= font2.render("Select difficulty", True, grey)
+text_easy = font2.render("Easy", True, red)
+text_easy2 = font2.render("Easy", True, grey)
+
+text_normal = font2.render("Normal", True, red)
+text_normal2 = font2.render("Normal", True, grey)
+
+text_hard = font2.render("Hard", True, red)
+text_hard2 = font2.render("Hard", True, grey)
+
 # ------------------- load images background gif ----------------------
 zero = pygame.image.load("0.png").convert()
 zero_scale = pygame.transform.scale(zero,(width,height))
@@ -134,11 +149,7 @@ class Button:
         surface.blit(self.image, self.rect)
         if self.hovered== True:
 
-            pygame.draw.polygon(surface, (grey), [
-                (self.rect.left - 5, self.rect.centery),
-                (self.rect.left - 25, self.rect.centery - 15),
-                (self.rect.left - 25, self.rect.centery + 15 )
-            ])
+            pygame.draw.circle(surface, grey, (self.rect.left - 10, self.rect.centery ), 5)
 
     def handle_event(self,event):
         if event.type == pygame.MOUSEMOTION:
@@ -153,29 +164,6 @@ class Button:
             if self.rect.collidepoint(event.pos):
                 self.action()
 
-class BloodDrop:
-    def __init__(self, x, y, radius=8, speed=1):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.speed = speed
-        self.reset_y = y
-
-    def update(self, height):
-        self.y += self.speed
-        if self.y > height:
-            self.y = self.reset_y
-
-    def draw(self, surface):
-        pygame.draw.circle(surface, red, (self.x, int(self.y)), self.radius)
-        pygame.draw.polygon(surface, red, [
-            (self.x - self.radius//2, int(self.y)),
-            (self.x + self.radius//2, int(self.y)),
-            (self.x, int(self.y) - self.radius*2)
-        ])
-
-
-blood_drop = BloodDrop(250, y=200, radius=8, speed=0.2)
 #---------- functions
 
 def show_play_screen():
@@ -185,6 +173,10 @@ def show_play_screen():
 def show_options_screen():
     global actual_screen
     actual_screen = "options_screen"
+
+def show_how2play_screen():
+    global actual_screen
+    actual_screen = "how2play_screen"
 
 def show_options_easy():
     global actual_screen
@@ -199,10 +191,18 @@ def show_options_hard():
     actual_screen == "hard_mode_screen"
 
 #----------- button
-buttons = [
-    Button(text_play,text_play2,100,250, show_play_screen),
-    Button(text_options,text_options2,100,400,show_options_screen)
+buttons_menu = [
+    Button(text_play,text_play2,90,250, show_play_screen),
+    Button(text_options,text_options2,115,300,show_options_screen),
+    Button(text_how2play,text_how2play2,155,350,show_how2play_screen),
     ]
+
+buttons_options = [
+    Button(text_easy,text_easy2,100,250, show_options_easy),
+    Button(text_normal,text_normal2,130,300, show_options_normal),
+    Button(text_hard,text_hard2,100,350, show_options_hard)   
+    ]
+
     #Button(hard1_scale,hard2_scale, width//2,400, show_options_mode)
     #Button(easy1_scale,easy2_scale, widht//2,400, show_options_mode)
     #Button(normal1_scale,normal2_scale,width//2,400, show_options_mode)
@@ -223,6 +223,7 @@ last_update = pygame.time.get_ticks()
 
 running = True
 actual_screen = "main_screen"
+current_difficulty = "normal"
 #--------------- bucle
 while running:
     for event in pygame.event.get():
@@ -237,7 +238,7 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "main_screen"
-            for button in buttons:
+            for button in buttons_menu:
                 button.handle_event(event)
 
 
@@ -245,8 +246,13 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "menu_screen"
-            for button in buttons:
+            for button in buttons_options:
                     button.handle_event(event)
+
+        elif actual_screen == "how2play_screen":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    actual_screen = "menu_screen"
             
         elif actual_screen == "easy_mode_screen" or actual_screen == "normal_mode_screen" or actual_screen == "hard_mode_screen":
             if event.type == pygame.KEYDOWN:
@@ -268,8 +274,6 @@ while running:
         screen.blit(text_enter,(250,500))
         screen.blit(title_game,(240,0))
         screen.blit(title_game2,(250,100))
-        blood_drop.update(height)
-        blood_drop.draw(screen)
 
     elif actual_screen == "menu_screen":
         #background -----------------------
@@ -282,7 +286,7 @@ while running:
             last_update = current_time      
         screen.blit(background_frames[frame_index], (0, 0))
         # ---------------------------------------------
-        for button in buttons:
+        for button in buttons_menu:
             button.draw_button(screen)  
 
     elif actual_screen == "play_screen":   #screen
@@ -290,9 +294,16 @@ while running:
         screen.blit(text_play,(0,0))
     elif actual_screen == "options_screen":   #screen
         screen.fill(black)
-        screen.blit(text_options_difficulty, (0,0))
-        screen.blit(text_volumen, (0,0))
-        screen.blit(text_options, (0,0))
+        screen.blit(text_options_difficulty, (width//2,height//6))
+        screen.blit(text_volumen, (100,250))
+        screen.blit(text_options, (100,300))
+
+        for button in buttons_options:
+            button.draw_button(screen)
+    
+    elif actual_screen == "how2play_screen":   #screen
+        screen.fill(black)
+        screen.blit(text_general_return,(0,0))
     
     elif actual_screen == "easy_mode":   #options
         screen.fill(black)
