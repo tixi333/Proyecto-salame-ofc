@@ -41,27 +41,39 @@ class salame:
 
 
 class food:
-    def __init__(self, name, image_name, health, value, rect=(pygame.Rect(10, 20, 85, 85))):
+    def __init__(self, name, image_name, health, value, rect=None):
         self.name = name
         self.image_name = image_name
         self.health = health
         self.value = value
         self.image = pygame.image.load(image_name).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
-        self.rect = rect
+        if rect is None:
+            self.rect = pygame.Rect(10, 20, 85, 85)
+        else:
+            self.rect = rect.copy()
 
     def draw(self):
-        if not hasattr(self, 'button'):
+        pos = (self.rect.x, self.rect.y, self.rect.width, self.rect.height)
+
+        if not hasattr(self, 'button') or getattr(self, 'button_pos', None) != pos:
+            if hasattr(self, 'button'):
+                try:
+                    self.button = None
+                except Exception:
+                    pass
             self.button = Button(
                 screen,
-                self.rect.x,
-                self.rect.y,
-                self.rect.width,
-                self.rect.height,
+                int(self.rect.x),
+                int(self.rect.y),
+                int(self.rect.width),
+                int(self.rect.height),
                 image=self.image,
                 onClick=self.feed_or_buy
             )
+            self.button_pos = pos
         else:
+            # same pos as last frame — just show the existing button
             self.button.show()
 
     def feed_or_buy(self):
@@ -76,7 +88,10 @@ class food:
                         f.write(str(money))
                     with open("food_bought.txt", "a") as f:
                         f.write(f"{self.name} | {self.image_name} | {self.health} | {self.value}\n")
-                    bought_food.append(self)
+                    new_rect = pygame.Rect(0, 0, 85, 85)
+                    new_rect.midbottom = (width // 2, height)
+                    bought_item = food(self.name, self.image_name, self.health, self.value, new_rect)
+                    bought_food.append(bought_item)
                 else:
                     button_flag_state = True
                     button_flag_type = "max food"
@@ -281,11 +296,10 @@ while running:
                         if os.path.getsize("food_bought.txt") > 0:
                             for i in f:
                                 name, image_name, health, value = i.strip().split(" | ")
-                                bought_food.append(food(name, image_name, int(health), int(value)))
+                                bought_food.append(food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height // 2 - 42, 85, 85)))
                 if bought_food:
                     screen.blit(arrowright_bottom, arrowright_bottom_rect)
                     screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
-                    bought_food[food_index].rect.midbottom = (width // 2, height)
                     general_buttons.append([bought_food[food_index]])
                     bought_food[food_index].draw()
                 else:
