@@ -26,9 +26,9 @@ text_play = font.render("Play", True, grey)
 #------------------ options screen text 
 text_options = font.render("Options", True, grey)
 
-text_easy = font.render("Easy mode description", True, grey)
-text_normal = font.render("Normal mode description", True, grey)
-text_hard = font.render("Hard mode description", True, grey)
+text_easy_d = font.render("Easy mode description", True, grey)
+text_normal_d = font.render("Normal mode description", True, grey)
+text_hard_d = font.render("Hard mode description", True, grey)
 text_volumen = font.render("Volumen",True, grey)
 text_options_difficulty = font.render("Modo de dificultad",True,grey)
 
@@ -294,9 +294,12 @@ while running:
         screen.blit(text_play,(0,0))
     elif actual_screen == "options_screen":   #screen
         screen.fill(black)
-        screen.blit(text_options_difficulty, (width//2,height//6))
+        screen.blit(text_options_difficulty, (100,200))
         screen.blit(text_volumen, (100,250))
         screen.blit(text_options, (100,300))
+        screen.blit(text_easy_d, (100,350))
+        screen.blit(text_normal_d, (100,400))
+        screen.blit(text_hard_d, (100,450))
 
         for button in buttons_options:
             button.draw_button(screen)
