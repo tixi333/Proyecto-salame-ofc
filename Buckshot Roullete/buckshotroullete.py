@@ -1,4 +1,5 @@
 import pygame
+from PIL import Image
 
 height = 600
 width = 800
@@ -64,64 +65,64 @@ text_hard = font.render("Hard", True, red)
 text_hard2 = font.render("Hard", True, grey)
 
 # ------------------- load images background gif ----------------------
-zero = pygame.image.load("0.png").convert()
+zero = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/0.png").convert()
 zero_scale = pygame.transform.scale(zero,(width,height))
 
-one = pygame.image.load("1.png").convert()
+one = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/1.png").convert()
 one_scale = pygame.transform.scale(one,(width,height))
 
-two= pygame.image.load("2.png").convert()
+two= pygame.image.load("Buckshot Roullete/background_buckshor_roullete/2.png").convert()
 two_scale = pygame.transform.scale(two,(width,height))
 
-three = pygame.image.load("3.png").convert()
+three = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/3.png").convert()
 three_scale = pygame.transform.scale(three,(width,height))
 
-four = pygame.image.load("4.png").convert()
+four = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/4.png").convert()
 four_scale = pygame.transform.scale(four,(width,height))
 
-five = pygame.image.load("5.png").convert()
+five = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/5.png").convert()
 five_scale = pygame.transform.scale(five,(width,height))
 
-six = pygame.image.load("6.png").convert()
+six = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/6.png").convert()
 six_scale = pygame.transform.scale(six,(width,height))
 
-seven = pygame.image.load("7.png").convert()
+seven = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/7.png").convert()
 seven_scale = pygame.transform.scale(seven,(width,height))
 
-eight = pygame.image.load("8.png").convert()
+eight = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/8.png").convert()
 eight_scale = pygame.transform.scale(eight,(width,height))
 
-nine = pygame.image.load("9.png").convert()
+nine = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/9.png").convert()
 nine_scale = pygame.transform.scale(nine,(width,height))
 
-ten = pygame.image.load("10.png").convert()
+ten = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/10.png").convert()
 ten_scale = pygame.transform.scale(ten,(width,height))
 
-eleven = pygame.image.load("11.png").convert()
+eleven = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/11.png").convert()
 eleven_scale = pygame.transform.scale(eleven,(width,height))
 
-twelve = pygame.image.load("12.png").convert()
+twelve = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/12.png").convert()
 twelve_scale = pygame.transform.scale(twelve,(width,height))
 
-thirteen = pygame.image.load("13.png").convert()
+thirteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/13.png").convert()
 thirteen_scale = pygame.transform.scale(thirteen,(width,height))
 
-fourteen = pygame.image.load("14.png").convert()
+fourteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/14.png").convert()
 fourteen_scale = pygame.transform.scale(fourteen,(width,height))
 
-fifteen = pygame.image.load("15.png").convert()
+fifteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/15.png").convert()
 fifteen_scale = pygame.transform.scale(fifteen,(width,height))
 
-sixteen = pygame.image.load("16.png").convert()
+sixteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/16.png").convert()
 sixteen_scale = pygame.transform.scale(sixteen,(width,height))
 
-seventeen = pygame.image.load("17.png").convert()
+seventeen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/17.png").convert()
 seventeen_scale = pygame.transform.scale(seventeen,(width,height))
 
-eighteen = pygame.image.load("18.png").convert()
+eighteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/18.png").convert()
 eighteen_scale = pygame.transform.scale(eighteen,(width,height))
 
-nineteen = pygame.image.load("19.png").convert()
+nineteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/19.png").convert()
 nineteen_scale = pygame.transform.scale(nineteen,(width,height))
 
 #------------------------------ play - cambiar
@@ -171,8 +172,37 @@ class Button:
             if self.rect.collidepoint(event.pos):
                 self.action()
                 
+class Button_activate:
+    def __init__(self,color1,color2,x,y,width,height):
+        self.color1 = color1
+        self.color2 = color2
+        self.state = False
+        self.rect = pygame.Rect(x,y,width,height)
 
+    def draw_button(self,surface):
+        if self.state == True:
+            self.actual_color = self.color2
+        else:
+            self.actual_color = self.color1
+        
+        pygame.draw.rect(surface, self.actual_color, self.rect)
 
+    def handle_event(self,button_activate, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos):
+                if button_activate:
+                    for button in button_activate:
+                        button.state = False
+                self.state = True
+                return True
+        return False
+    
+
+button_activate = [
+    Button_activate(red,grey,150, 255, 30, 30),
+    Button_activate(red, grey, 150, 305, 30, 30),  
+    Button_activate(red, grey, 150, 355, 30, 30)
+]
 #---------- functions
 
 def show_play_screen():
