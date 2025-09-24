@@ -75,7 +75,7 @@ def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
         x = random.randint(0, ANCHO - 40)
         y = random.randint(-600, -40)
         rect = img.get_rect(topleft=(x, y))
-        delay = random.randint(0, 60)  # frames de delay inicial
+        delay = random.randint(0, 60)
         comidas.append((img, rect, delay))
     x = random.randint(0, ANCHO - 40)
     y = random.randint(-600, -40)
