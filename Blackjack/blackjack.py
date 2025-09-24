@@ -129,7 +129,6 @@ def main():
         pygame.time.wait(2000)
         pygame.quit()
         sys.exit()
-    
     baraja = crear_baraja()
     jugador = [baraja.pop(), baraja.pop()]
     dealer = [baraja.pop(), baraja.pop()]

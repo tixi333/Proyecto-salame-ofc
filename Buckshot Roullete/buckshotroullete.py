@@ -149,8 +149,8 @@ class Button:
         self.action = action
         self.rect = self.image1.get_rect(center = (self.x,self.y))
         self.hovered= False
-        self.color1 = color1
-        self.color = color2
+        #self.color1 = color1
+        #self.color = color2
 
     def draw_button(self, surface):
         surface.blit(self.image, self.rect)
