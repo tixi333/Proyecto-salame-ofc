@@ -60,13 +60,24 @@ def cargar_imagen(nombre):
     return pygame.transform.scale(imagen, (80, 120))
 
 def pantalla_inicio():
+    mostrar_texto = True
+    tiempo_parpadeo = 500 
+    ultimo_cambio = pygame.time.get_ticks()
+
     while True:
         ventana.fill(VERDE)
 
-        titulo = FUENTE.render("BlacJack", True, BLANCO)
-        subtitulo = FUENTE.render("Presiona [Enter] para comenzar", True, BLANCO)
+        titulo = FUENTE.render("¡Cuida a tu salame! - Blackjack", True, BLANCO)
         ventana.blit(titulo, (ANCHO//2 - titulo.get_width()//2, ALTO//2 - 100))
-        ventana.blit(subtitulo, (ANCHO//2 - subtitulo.get_width()//2, ALTO//2))
+
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - ultimo_cambio > tiempo_parpadeo:
+            mostrar_texto = not mostrar_texto
+            ultimo_cambio = tiempo_actual
+
+        if mostrar_texto:
+            subtitulo = FUENTE.render("Presiona [Enter] para comenzar", True, BLANCO)
+            ventana.blit(subtitulo, (ANCHO//2 - subtitulo.get_width()//2, ALTO//2))
 
         pygame.display.flip()
 
