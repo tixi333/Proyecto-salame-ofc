@@ -1,14 +1,15 @@
-import pygame
-import pygame_widgets
-import os
+import pygame, pygame_widgets, os
 from pygame_widgets.button import Button
+from pygame_widgets.textbox import TextBox
+import openai
 from openai import OpenAI
+
+api_key = openai.api_key = "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"
+client = OpenAI(api_key=api_key)
+
 # seteo inicial
 pygame.init()
-
-width = 800
-height = 600
-screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
+screen = pygame.display.set_mode((width, height))  # seteo tamaÃ±o pantalla
 # colores
 WHITE = (245, 246, 252)
 BLACK = (30, 30, 35)
@@ -71,7 +72,7 @@ class food:
             )
             self.button_pos = pos
         else:
-            # same pos as last frame — just show the existing button
+            # same pos as last frame â€” just show the existing button
             self.button.show()
 
     def feed_or_buy(self):
@@ -109,7 +110,7 @@ class food:
     def hide(self):
         self.button.hide()
 
-#------------------------------------------------------------renders sin función--------------------------------------------------------
+#------------------------------------------------------------renders sin funciÃ³n--------------------------------------------------------
 
 # flechas generales de todos los back (salvo los flags)
 arrowright = pygame.image.load("arrowright.png").convert_alpha()
@@ -123,7 +124,7 @@ arrowleft_back_rect = arrowleft.get_rect()
 arrowleft_back_rect.center = (width // 2, height // 2)
 arrowleft_back_rect.right = arrowleft_back_rect.left - 200
 
-# flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
+# flechas inferiores para el menÃº de comida comprada (sÃ³lo en el fondo azul)
 arrowleft_bottom = pygame.transform.scale(arrowleft, (40, 40))
 arrowleft_bottom_rect = arrowleft_bottom.get_rect()
 arrowleft_bottom_rect.midbottom = (width // 2 - 100, height)
@@ -180,25 +181,39 @@ def read_page(page):
             name, image_name, health, value = line.strip().split(" | ")
             foods_on_page.append(food(name, image_name, int(health), int(value)))
     return foods_on_page
-
+#------------------------------------------------------------interacciÃ³n con salame------------------------------------------------------
 #para hablarle al salame
-def ask_salame(text):
+salame_reply = ""
+text = ""
+def output():
+    global salame_reply
     client = OpenAI()
     response = client.responses.create(
         model="gpt-4o",
         instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
-        input=text
+        input=textbox.getText()
 )
-    return response.text.strip()
-
-user_input = ""
-input_rect = pygame.Rect(100, 480, 600, 60)  
-salame_reply = ""  
-    
+    salame_reply = response.text.strip()
+    return
 
 
+textbox = TextBox(
+    screen,
+    50,                
+    height - 80,       
+    700,               
+    60,                
+    fontSize=28,
+    font=font,
+    borderColour=ACCENT,
+    textColour=BLACK,
+    onSubmit=output,
+    radius=10,
+    borderThickness=3
+)
+textbox.hide()  
 
-# para poder manejar los botones
+#------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
 button_flag_state = False
 button_flag_type = ""
@@ -235,13 +250,15 @@ def clear_buttons():
             widget.hide()
         general_buttons.clear()
 
+#------------------------------------------------------------bucle principal------------------------------------------------------
 # instancia salame
 salame = salame()
 
 running = True
 while running:
     clear_buttons()
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
@@ -262,84 +279,69 @@ while running:
                 elif backgrounds[index] == BLUE:
                     food_index = (food_index + 1) % len(bought_food)
 
-        current_background = backgrounds[index]
+    current_background = backgrounds[index]
+    textbox.hide()
 
-        if button_flag_state and button_flag is not None:
-            pygame_widgets.update(event)
-            pygame.display.update()
-            continue
-        elif show_info:
-            screen.fill(WHITE)
-            screen.blit(i_text, i_rect)
-        else:
-            screen.fill(backgrounds[index])
-            salame.draw(screen)
-            screen.blit(arrowright, arrowright_back_rect)
-            screen.blit(arrowleft, arrowleft_back_rect)
-            screen.blit(info_text, info_rect)
-            with open("money.txt", "r") as m:
-                money = m.readline()
-            money = font.render(money, True, BLACK)
-            money_text_rect = money.get_rect()
-            money_text_rect.topleft = (55, 15)
-            screen.blit(money, money_text_rect)
-            screen.blit(money_image, money_image_rect)
+    if button_flag_state and button_flag is not None:
+        pygame_widgets.update(events)
+        pygame.display.update()
+        continue
+    elif show_info:
+        screen.fill(WHITE)
+        screen.blit(i_text, i_rect)
+    else:
+        screen.fill(backgrounds[index])
+        salame.draw(screen)
+        screen.blit(arrowright, arrowright_back_rect)
+        screen.blit(arrowleft, arrowleft_back_rect)
+        screen.blit(info_text, info_rect)
+        with open("money.txt", "r") as m:
+            money = m.readline()
+        money = font.render(money, True, BLACK)
+        money_text_rect = money.get_rect()
+        money_text_rect.topleft = (55, 15)
+        screen.blit(money, money_text_rect)
+        screen.blit(money_image, money_image_rect)
 
-            if current_background == BLUE:
-                if buymenu:
-                    screen.fill(WHITE)
-                    page_foods = read_page(current_page)
-                    general_buttons.append(page_foods)
-                    height_offset = 0
-                    for current_food in page_foods:
-                        current_food.rect.topleft = (10, 2 + height_offset)
-                        text = font.render(f"{current_food.name} | Salud: {current_food.health} | Precio: {current_food.value}", True, BLACK)
-                        current_food.draw()
-                        screen.blit(text, (100, 22 + height_offset))
-                        height_offset += 85
-                    if button_flag_state:
-                        if button_flag is None:
-                            if button_flag_type == "no money":
-                                flag_button("No tienes suficiente dinero")
-                            elif button_flag_type == "max food":
-                                flag_button("No puedes comprar más comida")
-                else:         
-                    if not bought_food:
-                        with open("food_bought.txt", "r") as f:
-                            if os.path.getsize("food_bought.txt") > 0:
-                                for i in f:
-                                    name, image_name, health, value = i.strip().split(" | ")
-                                    bought_food.append(food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height // 2 - 42, 85, 85)))
-                    if bought_food:
-                        screen.blit(arrowright_bottom, arrowright_bottom_rect)
-                        screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
-                        general_buttons.append([bought_food[food_index]])
-                        bought_food[food_index].draw()
-                    else:
-                        screen.blit(no_food_text, no_food_rect)
-                        
-            elif current_background == GREEN:
-                pygame.draw.rect(screen, WHITE, input_rect, border_radius=10)
-                pygame.draw.rect(screen, BLACK, input_rect, 3, border_radius=10)
-
-                input_surf = font.render(user_input, True, BLACK)
-                screen.blit(input_surf, (input_rect.x + 10, input_rect.y + (input_rect.height - input_surf.get_height())//2))
-
-                if salame_reply:
-                    reply_surf = font.render(salame_reply, True, BLACK)
-                    reply_rect = reply_surf.get_rect()
-                    reply_rect.topleft = (input_rect.x, input_rect.y - reply_rect.height - 8)
-                    screen.blit(reply_surf, reply_rect)
-
-                if event.key == pygame.K_BACKSPACE:
-                    user_input = user_input[:-1]
-                elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                    if user_input.strip():
-                        salame_reply = ask_salame(user_input.strip())
-                    user_input = ""
+        if current_background == BLUE:
+            if buymenu:
+                screen.fill(WHITE)
+                page_foods = read_page(current_page)
+                general_buttons.append(page_foods)
+                height_offset = 0
+                for current_food in page_foods:
+                    current_food.rect.topleft = (10, 2 + height_offset)
+                    text = font.render(f"{current_food.name} | Salud: {current_food.health} | Precio: {current_food.value}", True, BLACK)
+                    current_food.draw()
+                    screen.blit(text, (100, 22 + height_offset))
+                    height_offset += 85
+                if button_flag_state:
+                    if button_flag is None:
+                        if button_flag_type == "no money":
+                            flag_button("No tienes suficiente dinero")
+                        elif button_flag_type == "max food":
+                            flag_button("No puedes comprar más comida")
+            else:         
+                if not bought_food:
+                    with open("food_bought.txt", "r") as f:
+                        if os.path.getsize("food_bought.txt") > 0:
+                            for i in f:
+                                name, image_name, health, value = i.strip().split(" | ")
+                                bought_food.append(food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height // 2 - 42, 85, 85)))
+                if bought_food:
+                    screen.blit(arrowright_bottom, arrowright_bottom_rect)
+                    screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
+                    general_buttons.append([bought_food[food_index]])
+                    bought_food[food_index].draw()
                 else:
-                    if hasattr(event, "unicode") and event.unicode and event.unicode.isprintable():
-                        user_input += event.unicode
+                    screen.blit(no_food_text, no_food_rect)
+        elif current_background == GREEN:
+            textbox.show()
+            if salame_reply:
+                reply_surface = font.render(salame_reply, True, BLACK)
+                reply_rect = reply_surface.get_rect()
+                reply_rect.midbottom = (width//2, height - 100)  
+                screen.blit(reply_surface, reply_rect)
 
-    pygame_widgets.update(event)
-    pygame.display.update()
+        pygame_widgets.update(events)
+        pygame.display.update()
