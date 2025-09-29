@@ -4,7 +4,6 @@ from pygame_widgets.textbox import TextBox
 import openai
 from openai import OpenAI
 
-api_key = openai.api_key
 client = OpenAI(api_key=api_key)
 
 # seteo inicial
