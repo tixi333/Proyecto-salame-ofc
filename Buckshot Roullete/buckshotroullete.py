@@ -1,5 +1,4 @@
 import pygame
-from PIL import Image
 
 height = 600
 width = 800
@@ -65,64 +64,64 @@ text_hard = font.render("Hard", True, red)
 text_hard2 = font.render("Hard", True, grey)
 
 # ------------------- load images background gif ----------------------
-zero = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/0.png").convert()
+zero = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/0.png").convert()
 zero_scale = pygame.transform.scale(zero,(width,height))
 
-one = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/1.png").convert()
+one = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/1.png").convert()
 one_scale = pygame.transform.scale(one,(width,height))
 
-two= pygame.image.load("Buckshot Roullete/background_buckshor_roullete/2.png").convert()
+two= pygame.image.load("Buckshot Roullete/background_buckshot_roullete/2.png").convert()
 two_scale = pygame.transform.scale(two,(width,height))
 
-three = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/3.png").convert()
+three = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/3.png").convert()
 three_scale = pygame.transform.scale(three,(width,height))
 
-four = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/4.png").convert()
+four = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/4.png").convert()
 four_scale = pygame.transform.scale(four,(width,height))
 
-five = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/5.png").convert()
+five = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/5.png").convert()
 five_scale = pygame.transform.scale(five,(width,height))
 
-six = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/6.png").convert()
+six = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/6.png").convert()
 six_scale = pygame.transform.scale(six,(width,height))
 
-seven = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/7.png").convert()
+seven = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/7.png").convert()
 seven_scale = pygame.transform.scale(seven,(width,height))
 
-eight = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/8.png").convert()
+eight = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/8.png").convert()
 eight_scale = pygame.transform.scale(eight,(width,height))
 
-nine = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/9.png").convert()
+nine = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/9.png").convert()
 nine_scale = pygame.transform.scale(nine,(width,height))
 
-ten = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/10.png").convert()
+ten = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/10.png").convert()
 ten_scale = pygame.transform.scale(ten,(width,height))
 
-eleven = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/11.png").convert()
+eleven = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/11.png").convert()
 eleven_scale = pygame.transform.scale(eleven,(width,height))
 
-twelve = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/12.png").convert()
+twelve = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/12.png").convert()
 twelve_scale = pygame.transform.scale(twelve,(width,height))
 
-thirteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/13.png").convert()
+thirteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/13.png").convert()
 thirteen_scale = pygame.transform.scale(thirteen,(width,height))
 
-fourteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/14.png").convert()
+fourteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/14.png").convert()
 fourteen_scale = pygame.transform.scale(fourteen,(width,height))
 
-fifteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/15.png").convert()
+fifteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/15.png").convert()
 fifteen_scale = pygame.transform.scale(fifteen,(width,height))
 
-sixteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/16.png").convert()
+sixteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/16.png").convert()
 sixteen_scale = pygame.transform.scale(sixteen,(width,height))
 
-seventeen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/17.png").convert()
+seventeen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/17.png").convert()
 seventeen_scale = pygame.transform.scale(seventeen,(width,height))
 
-eighteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/18.png").convert()
+eighteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/18.png").convert()
 eighteen_scale = pygame.transform.scale(eighteen,(width,height))
 
-nineteen = pygame.image.load("Buckshot Roullete/background_buckshor_roullete/19.png").convert()
+nineteen = pygame.image.load("Buckshot Roullete/background_buckshot_roullete/19.png").convert()
 nineteen_scale = pygame.transform.scale(nineteen,(width,height))
 
 #------------------------------ play - cambiar
