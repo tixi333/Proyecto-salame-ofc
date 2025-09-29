@@ -32,7 +32,6 @@ def mostrar_personaje_dialogo(mensaje):
     else:
         ventana.blit(personaje_img, (personaje_x, personaje_y))
 
-    
     fuente_grande = pygame.font.Font("monogram-extended.ttf", 40) 
     texto = fuente_grande.render(mensaje, True, NEGRO)
 
@@ -59,6 +58,26 @@ def cargar_imagen(nombre):
     ruta = os.path.join(RUTA_CARTAS, nombre + ".png")
     imagen = pygame.image.load(ruta)
     return pygame.transform.scale(imagen, (80, 120))
+
+def pantalla_inicio():
+    while True:
+        ventana.fill(VERDE)
+
+        titulo = FUENTE.render("BlacJack", True, BLANCO)
+        subtitulo = FUENTE.render("Presiona [Enter] para comenzar", True, BLANCO)
+        ventana.blit(titulo, (ANCHO//2 - titulo.get_width()//2, ALTO//2 - 100))
+        ventana.blit(subtitulo, (ANCHO//2 - subtitulo.get_width()//2, ALTO//2))
+
+        pygame.display.flip()
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_RETURN:
+                    return
+
 
 def leer_dinero():
    with open("money.txt", "r") as archivo:
@@ -202,4 +221,5 @@ def main():
         clock.tick(30)
 
 if __name__ == "__main__":
+    pantalla_inicio()
     main()
