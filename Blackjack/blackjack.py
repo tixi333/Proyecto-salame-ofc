@@ -60,6 +60,16 @@ def cargar_imagen(nombre):
     imagen = pygame.image.load(ruta)
     return pygame.transform.scale(imagen, (80, 120))
 
+def leer_dinero():
+   with open("money.txt", "r") as archivo:
+        return int(archivo.read())
+
+
+def escribir_dinero(dinero):
+    with open("money.txt", "w") as archivo:
+        archivo.write(str(dinero))
+
+
 def crear_baraja():
     baraja = []
     for palo in PALOS:
@@ -108,9 +118,17 @@ def mostrar_controles():
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
-
 def main():
     clock = pygame.time.Clock()
+    dinero = leer_dinero()
+    print(f"Tienes {dinero} en tu cuenta.")
+    
+    if dinero < 100:
+        mostrar_mensaje("No tienes suficiente dinero para jugar.")
+        pygame.display.flip()
+        pygame.time.wait(2000)
+        pygame.quit()
+        sys.exit()
     baraja = crear_baraja()
     jugador = [baraja.pop(), baraja.pop()]
     dealer = [baraja.pop(), baraja.pop()]
