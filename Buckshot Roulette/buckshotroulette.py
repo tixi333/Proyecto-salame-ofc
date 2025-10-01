@@ -37,7 +37,12 @@ text_hard_d = font.render("Hard mode description", True, red)
 
 text_volumen = font.render("Volumen",True, grey)
 text_options_difficulty = font.render("Modo de dificultad",True,grey)
+#------------------- current description
+c_easy = font.render("// Current mode: Easy", True, red)
+c_normal = font.render("// Current mode: Normal", True, red)
+c_hard = font.render("// Current mode: Hard", True, red)
 
+#----------------- difficulty description
 easy = font0.render("descripcion easy", True, grey)
 normal = font0.render("descripcion normal", True, grey)
 hard = font0.render("descripcion hard", True, grey)
@@ -127,6 +132,19 @@ eighteen_scale = pygame.transform.scale(eighteen,(width,height))
 
 nineteen = pygame.image.load("Buckshot Roulette/background_buckshot_roulette/19.png").convert()
 nineteen_scale = pygame.transform.scale(nineteen,(width,height))
+#------------------ items
+
+lupa = pygame.image.load("Buckshot Roulette/items/lupa.png").convert() #
+adrenaline = pygame.image.load("Buckshot Roulette/items/adrenaline.png").convert() #
+bullet = pygame.image.load("Buckshot Roulette/items/bullet.png").convert() #
+shotgun = pygame.image.load("Buckshot Roulette/items/shotgun.png").convert() #
+cigarette = pygame.image.load("Buckshot Roulette/items/cigarette.png").convert() #
+burner_phone= pygame.image.load("Buckshot Roulette/items/burner_phone.png").convert()
+handcuff = pygame.image.load("Buckshot Roulette/items/handcuff.png").convert() #
+inverter = pygame.image.load("Buckshot Roulette/items/inverter.png").convert()
+jammer = pygame.image.load("Buckshot Roulette/items/jammer.png").convert() #
+
+
 
 # ---------------------------
 class Button:
@@ -147,8 +165,8 @@ class Button:
         if self.hovered== True:
             if self.function == "menu":
                 pygame.draw.circle(surface, grey, (self.rect.left - 10, self.rect.centery ), 5)
-        if self.text != False:
-            surface.blit(self.text, (200, 160))
+            if self.text != False:
+                surface.blit(self.text, (50, 500))
 
     def handle_event(self,event):
         if event.type == pygame.MOUSEMOTION:
@@ -178,7 +196,8 @@ class Activate:
         
         pygame.draw.rect(surface, self.actual_color, self.rect)
         if self.state == True:
-            screen.blit(self.current, (60,400))
+            screen.blit(self.current, (350,200))
+
     def handle_event(self,button_activate,event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
@@ -190,15 +209,18 @@ class Activate:
     
 
 button_activate = [
-    Activate(red,grey,150, 255, 30, 30,easy),
-    Activate(red, grey, 150, 305, 30, 30,normal),  
-    Activate(red, grey, 150, 355, 30, 30,hard)
+    Activate(red,grey,150, 255, 30, 30,c_easy),
+    Activate(red, grey, 150, 305, 30, 30,c_normal),
+    Activate(red, grey, 150, 355, 30, 30,c_hard)
 ]
 #---------- functions
 
 def show_play_screen():
     global actual_screen
     actual_screen = "play_screen"
+
+
+
 
 def show_options_screen():
     global actual_screen
@@ -330,9 +352,9 @@ while running:
         screen.blit(text_options_difficulty, (50,200))
         screen.blit(text_volumen, (50,100))
         screen.blit(text_options, (200,20))
-        screen.blit(text_easy,(60,265))
-        screen.blit(text_normal,(60,315))
-        screen.blit(text_hard,(60,365))
+        screen.blit(text_easy,(50,250))
+        screen.blit(text_normal,(50,300))
+        screen.blit(text_hard,(50,350))
         pygame.draw.line(screen, grey, (50,150), (700,150), 2)
         pygame.draw.line(screen, grey, (50,240), (700,240), 2)
         pygame.draw.line(screen, grey, (50,400), (700,400), 2)
@@ -343,24 +365,9 @@ while running:
         for button in button_activate:
             button.draw_button(screen)
     
-    elif actual_screen == "how2play_screen":   #screen
+    elif actual_screen == "how2play_screen":  
         screen.fill(black)
         screen.blit(text_general_return,(0,0))
-    
-    elif actual_screen == "easy_mode":   #options
-        screen.fill(black)
-        screen.blit(text_easy(0,0))
-        screen.blit(text_general_return(0,0))
-
-    elif actual_screen == "normal_mode": #options
-        screen.fill(black)
-        screen.blit(text_normal(0,0))
-        screen.blit(text_general_return(0,0))
-
-    elif actual_screen == "hard_mode": #options
-        screen.fill(black)
-        screen.blit(text_hard(0,0))
-        screen.blit(text_general_return(0,0))
 
     pygame.display.flip()
 
