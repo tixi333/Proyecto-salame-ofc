@@ -32,7 +32,6 @@ def mostrar_personaje_dialogo(mensaje):
     else:
         ventana.blit(personaje_img, (personaje_x, personaje_y))
 
-    
     fuente_grande = pygame.font.Font("monogram-extended.ttf", 40) 
     texto = fuente_grande.render(mensaje, True, NEGRO)
 
@@ -59,6 +58,47 @@ def cargar_imagen(nombre):
     ruta = os.path.join(RUTA_CARTAS, nombre + ".png")
     imagen = pygame.image.load(ruta)
     return pygame.transform.scale(imagen, (80, 120))
+
+def pantalla_inicio():
+    mostrar_texto = True
+    tiempo_parpadeo = 500 
+    ultimo_cambio = pygame.time.get_ticks()
+
+    while True:
+        ventana.fill(VERDE)
+
+        titulo = FUENTE.render("¡Cuida a tu salame! - Blackjack", True, BLANCO)
+        ventana.blit(titulo, (ANCHO//2 - titulo.get_width()//2, ALTO//2 - 100))
+
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - ultimo_cambio > tiempo_parpadeo:
+            mostrar_texto = not mostrar_texto
+            ultimo_cambio = tiempo_actual
+
+        if mostrar_texto:
+            subtitulo = FUENTE.render("Presiona [Enter] para comenzar", True, BLANCO)
+            ventana.blit(subtitulo, (ANCHO//2 - subtitulo.get_width()//2, ALTO//2))
+
+        pygame.display.flip()
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_RETURN:
+                    return
+
+
+def leer_dinero():
+   with open("money.txt", "r") as archivo:
+        return int(archivo.read())
+
+
+def escribir_dinero(dinero):
+    with open("money.txt", "w") as archivo:
+        archivo.write(str(dinero))
+
 
 def crear_baraja():
     baraja = []
@@ -108,9 +148,17 @@ def mostrar_controles():
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
-
 def main():
     clock = pygame.time.Clock()
+    dinero = leer_dinero()
+    print(f"Tienes {dinero} en tu cuenta.")
+    
+    if dinero < 100:
+        mostrar_mensaje("No tienes suficiente dinero para jugar.")
+        pygame.display.flip()
+        pygame.time.wait(2000)
+        pygame.quit()
+        sys.exit()
     baraja = crear_baraja()
     jugador = [baraja.pop(), baraja.pop()]
     dealer = [baraja.pop(), baraja.pop()]
@@ -184,4 +232,5 @@ def main():
         clock.tick(30)
 
 if __name__ == "__main__":
+    pantalla_inicio()
     main()
