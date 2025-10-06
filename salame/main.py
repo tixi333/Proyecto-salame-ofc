@@ -1,7 +1,7 @@
-import pygame, pygame_widgets, os
+import pygame, pygame_widgets, os, time, openai
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
-import openai
+from pygame_widgets.progressbar import ProgressBar
 # seteo inicial
 pygame.init()
 
@@ -22,11 +22,23 @@ ACCENT = (90, 200, 255)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
-
+# openai cliente
+#--------------------------------seteo daño salud--------------------------------------------------------------
+with open("lasttime.txt", "r") as f:
+    last_time = f.read().strip()
+current_time = time.monotonic()
+last_time = float(last_time) if last_time else current_time
+elapsed_time = current_time - last_time
+health_decrease = int(elapsed_time // 3600) * 5  
+with open("health.txt", "r") as f:
+    current_health = int(f.read().strip()) if f.read().strip().isdigit() else 100
+current_health -= health_decrease
+if current_health < 0:
+    current_health = 0
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class salame:
-    def __init__(self):
-        self.health = 100
+    def __init__(self, current_health=current_health):
+        self.health = current_health
         self.happiness = 100
         self.image = pygame.image.load("salame.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (400, 400))
@@ -36,6 +48,8 @@ class salame:
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
+# instancia salame
+salame = salame()
 
 class food:
     def __init__(self, name, image_name, health, value, rect=None):
@@ -70,7 +84,6 @@ class food:
             )
             self.button_pos = pos
         else:
-            # same pos as last frame — just show the existing button
             self.button.show()
 
     def feed_or_buy(self):
@@ -147,6 +160,26 @@ money_image = pygame.transform.scale(money_image, (40, 40))
 money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
 
+#------------------------------------------------------------para nivel de energía------------------------------------------------------
+def progress():
+    return salame.health
+health_bar = ProgressBar(
+    screen,
+    600,                
+    15,       
+    180,               
+    30,                
+    min=0,
+    max=100,
+    initial=0,
+    progress=progress,
+    borderColour=BLACK,
+    fillColour=GREEN,
+    backgroundColour=GRAY,
+    radius=10,
+    borderThickness=3,
+    curved=True
+    )
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
@@ -182,24 +215,26 @@ def read_page(page):
 #------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
 salame_reply = ""
-def ask_salame(text):
-    client = OpenAI()
-    response = client.responses.create(
-        model="gpt-4o",
-        instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
-        input=text
+def ask_salame():
+    global salame_reply
+    text = textbox.getText()
+    textbox.setText("")
+    messages_with_instructions = [
+    {"role": "system", "content":  "You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep responses formatted as a single string, keeping it under 25 words, and answer in the same language as the input."},
+    {"role": "user", "content": text},
+]
+
+    response = client.chat.completions.create(
+    model="gpt-5-mini",
+    messages=messages_with_instructions,
 )
-    return response.text.strip()
+     
+    if response and response.choices:
+        salame_reply = str(response.choices[0].message.content.strip())
+    else:
+        salame_reply = "..."
 
-def output(text):
-    global  textbox
-    response = ask_salame(text) 
-    textbox.setText("")     
-    return response
 
-def render_salame_reply(salame_reply):
-    global textbox
-    textbox.setText(salame_reply)
     
 textbox = TextBox(
     screen,
@@ -211,7 +246,7 @@ textbox = TextBox(
     font=font,
     borderColour=(255, 0, 0),
     textColour=(0, 200, 0),
-    onSubmit=output,
+    onSubmit=ask_salame,
     radius=10,
     borderThickness=3
 )
@@ -224,15 +259,18 @@ button_flag_type = ""
 button_flag = None
 
 def flag_button(text):
-    global button_flag
+    global button_flag_state, button_flag
+    button_flag_state = True
+    text_rect = font.render(text, True, BLACK)
+    text_rect = text_rect.get_rect()
     button_flag = Button(
                 screen,
                 width // 2,
                 height // 2,
-                400,
-                50,
+                text_rect.width + 30,
+                text_rect.height + 20,
                 text=text,
-                font = font,
+                font=font,
                 fontSize=30,
                 margin=10,
                 inactiveColour=PURPLE,
@@ -255,14 +293,18 @@ def clear_buttons():
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
-# instancia salame
-salame = salame()
 
 running = True
 while running:
     clear_buttons()
     events = pygame.event.get()
     for event in events:
+        if event.type == pygame.QUIT:
+            with open("lasttime.txt", "w") as f:
+                f.write(time.monotonic())
+            with open("health.txt", "w") as f:
+                f.write(str(salame.health))
+            running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
@@ -286,7 +328,7 @@ while running:
     current_background = backgrounds[index]
 
     if button_flag_state and button_flag is not None:
-        pygame_widgets.update(event)
+        pygame_widgets.update(events)
         pygame.display.update()
         continue
     elif show_info:
@@ -342,13 +384,10 @@ while running:
         if current_background == GREEN:
             textbox.show()
             if salame_reply:
-                reply_surface = font.render(salame_reply, True, BLACK)
-                reply_rect = reply_surface.get_rect()
-                reply_rect.midbottom = (width//2, height - 100)  # above the box
-                screen.blit(reply_surface, reply_rect)     
+                flag_button(salame_reply)
         else:
             textbox.hide()
 
-        pygame_widgets.update(event)
+        pygame_widgets.update(events)
         pygame.display.update()
         
