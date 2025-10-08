@@ -22,20 +22,26 @@ ACCENT = (90, 200, 255)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
-# openai cliente
+client = ""
 #--------------------------------seteo daño salud--------------------------------------------------------------
 with open("lasttime.txt", "r") as f:
     last_time = f.read().strip()
 current_time = time.monotonic()
-last_time = float(last_time) if last_time else current_time
+if last_time:
+    last_time = float(last_time) 
+else:
+    last_time = current_time
 elapsed_time = current_time - last_time
 health_decrease = int(elapsed_time // 3600) * 5  
 with open("health.txt", "r") as f:
-    current_health = int(f.read().strip()) if f.read().strip().isdigit() else 100
+    if os.path.getsize("health.txt") > 0:
+        current_health = int(f.read().strip())
+    else:
+        current_health = 100
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
-#-------------------acceder a una imagen ------------------------------------
+#-------------------acceder a una imagen --------------------------------------------------------------------
 def get_path(filename):
     path = f"salame/food_main/{filename}"
     path = os.path.abspath(path)
@@ -166,25 +172,19 @@ money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
 
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
-#def progress():
- #   return salame.health
-#health_bar = ProgressBar(
- #   screen,
-  #  600,                
-   # 15,       
-   # 180,               
-    #30,                
-    #min=0,
-    #max=100,
-    #initial=0,
-    #progress=progress,
-    #borderColour=BLACK,
-    #fillColour=GREEN,
-    #backgroundColour=GRAY,
-    #radius=10,
-    #borderThickness=3,
-    #curved=True
-    #)
+def progress():
+    return float(salame.health/100)
+health_bar = ProgressBar(
+    screen,
+    200,                
+    15,       
+    180,               
+    30,                
+    progress=progress,
+    completedColour=PURPLE,
+    incompletedColour=GRAY,
+    )
+health_bar.show()
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
@@ -270,10 +270,10 @@ def flag_button(text):
     text_rect = text_rect.get_rect()
     button_flag = Button(
                 screen,
-                width // 2,
-                height // 2,
-                text_rect.width + 30,
-                text_rect.height + 20,
+                width // 2 - 200,
+                height // 2 - 80,
+                text_rect.width + 20,
+                text_rect.height + 100,
                 text=text,
                 font=font,
                 fontSize=30,
@@ -309,6 +309,9 @@ while running:
                 f.write(str(time.monotonic()))
             with open("health.txt", "w") as f:
                 f.write(str(salame.health))
+            with open("food_bought.txt", "w") as f:
+                for i in bought_food:
+                    f.write(f"{i.name} | {i.image_name} | {i.health} | {i.value}\n")
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -318,7 +321,8 @@ while running:
             elif event.key == pygame.K_i:
                 show_info = not show_info
             elif event.key == pygame.K_b:
-                buymenu = not buymenu
+                if backgrounds[index] == BLUE:
+                    buymenu = not buymenu
             elif event.key == pygame.K_a:
                 if buymenu:
                     current_page = (current_page - 1) % total_pages
@@ -344,6 +348,7 @@ while running:
         salame.draw(screen)
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
+        health_bar.show()
         screen.blit(info_text, info_rect)
         with open("money.txt", "r") as m:
             money = m.readline()
@@ -356,6 +361,7 @@ while running:
         if current_background == BLUE:
             if buymenu:
                 screen.fill(WHITE)
+                health_bar.hide()
                 page_foods = read_page(current_page)
                 general_buttons.append(page_foods)
                 height_offset = 0
