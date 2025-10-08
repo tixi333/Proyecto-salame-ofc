@@ -1,17 +1,14 @@
-import pygame, pygame_widgets, os
+import pygame, pygame_widgets, os, time, openai
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
-import openai 
+import openai
+from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(api_key=api_key)
 
 # seteo inicial
 pygame.init()
-
-width = 800
-height = 600
-
-screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
+screen = pygame.display.set_mode((width, height))  # seteo tamaÃ±o pantalla
 # colores
 WHITE = (245, 246, 252)
 BLACK = (30, 30, 35)
@@ -26,11 +23,28 @@ ACCENT = (90, 200, 255)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
-
+# openai cliente
+#--------------------------------seteo daño salud--------------------------------------------------------------
+with open("lasttime.txt", "r") as f:
+    last_time = f.read().strip()
+current_time = time.monotonic()
+last_time = float(last_time) if last_time else current_time
+elapsed_time = current_time - last_time
+health_decrease = int(elapsed_time // 3600) * 5  
+with open("health.txt", "r") as f:
+    current_health = int(f.read().strip()) if f.read().strip().isdigit() else 100
+current_health -= health_decrease
+if current_health < 0:
+    current_health = 0
+#-------------------acceder a una imagen ------------------------------------
+def get_path(filename):
+    path = f"salame/food_main/{filename}"
+    path = os.path.abspath(path)
+    return path
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class salame:
-    def __init__(self):
-        self.health = 100
+    def __init__(self, current_health=current_health):
+        self.health = current_health
         self.happiness = 100
         self.image = pygame.image.load("salame.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (400, 400))
@@ -40,6 +54,8 @@ class salame:
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
+# instancia salame
+salame = salame()
 
 class food:
     def __init__(self, name, image_name, health, value, rect=None):
@@ -111,7 +127,7 @@ class food:
     def hide(self):
         self.button.hide()
 
-#------------------------------------------------------------renders sin funciÃ³n--------------------------------------------------------
+#------------------------------------------------------------renders sin función--------------------------------------------------------
 
 # flechas generales de todos los back (salvo los flags)
 arrowright = pygame.image.load("arrowright.png").convert_alpha()
@@ -125,7 +141,7 @@ arrowleft_back_rect = arrowleft.get_rect()
 arrowleft_back_rect.center = (width // 2, height // 2)
 arrowleft_back_rect.right = arrowleft_back_rect.left - 200
 
-# flechas inferiores para el menÃº de comida comprada (sÃ³lo en el fondo azul)
+# flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
 arrowleft_bottom = pygame.transform.scale(arrowleft, (40, 40))
 arrowleft_bottom_rect = arrowleft_bottom.get_rect()
 arrowleft_bottom_rect.midbottom = (width // 2 - 100, height)
@@ -150,6 +166,26 @@ money_image = pygame.transform.scale(money_image, (40, 40))
 money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
 
+#------------------------------------------------------------para nivel de energía------------------------------------------------------
+#def progress():
+ #   return salame.health
+#health_bar = ProgressBar(
+ #   screen,
+  #  600,                
+   # 15,       
+   # 180,               
+    #30,                
+    #min=0,
+    #max=100,
+    #initial=0,
+    #progress=progress,
+    #borderColour=BLACK,
+    #fillColour=GREEN,
+    #backgroundColour=GRAY,
+    #radius=10,
+    #borderThickness=3,
+    #curved=True
+    #)
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
@@ -180,14 +216,14 @@ def read_page(page):
             if i >= start_line + ITEMS_PER_PAGE:
                 break
             name, image_name, health, value = line.strip().split(" | ")
-            foods_on_page.append(food(name, image_name, int(health), int(value)))
+            foods_on_page.append(food(name, get_path(image_name), int(health), int(value)))
     return foods_on_page
-#------------------------------------------------------------interacciÃ³n con salame------------------------------------------------------
+#------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
 salame_reply = ""
-text = ""
-def output():
+def ask_salame():
     global salame_reply
+    client = OpenAI()
     response = client.responses.create(
         model="gpt-4o",
         instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
@@ -196,7 +232,7 @@ def output():
     salame_reply = response.text.strip()
     return
 
-
+    
 textbox = TextBox(
     screen,
     50,                
@@ -205,13 +241,13 @@ textbox = TextBox(
     60,                
     fontSize=28,
     font=font,
-    borderColour=ACCENT,
-    textColour=BLACK,
-    onSubmit=output,
+    borderColour=(255, 0, 0),
+    textColour=(0, 200, 0),
+    onSubmit=ask_salame,
     radius=10,
     borderThickness=3
 )
-textbox.hide()  
+textbox.hide()
 
 #------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
@@ -220,15 +256,18 @@ button_flag_type = ""
 button_flag = None
 
 def flag_button(text):
-    global button_flag
+    global button_flag_state, button_flag
+    button_flag_state = True
+    text_rect = font.render(text, True, BLACK)
+    text_rect = text_rect.get_rect()
     button_flag = Button(
                 screen,
                 width // 2,
                 height // 2,
-                400,
-                50,
+                text_rect.width + 30,
+                text_rect.height + 20,
                 text=text,
-                font = font,
+                font=font,
                 fontSize=30,
                 margin=10,
                 inactiveColour=PURPLE,
@@ -251,16 +290,12 @@ def clear_buttons():
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
-# instancia salame
-salame = salame()
 
 running = True
 while running:
     clear_buttons()
     events = pygame.event.get()
     for event in events:
-        if event.type == pygame.QUIT:
-            running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
@@ -282,7 +317,6 @@ while running:
                     food_index = (food_index + 1) % len(bought_food)
 
     current_background = backgrounds[index]
-    textbox.hide()
 
     if button_flag_state and button_flag is not None:
         pygame_widgets.update(events)
@@ -337,13 +371,15 @@ while running:
                     bought_food[food_index].draw()
                 else:
                     screen.blit(no_food_text, no_food_rect)
-        elif current_background == GREEN:
+        
+        if current_background == GREEN:
             textbox.show()
             if salame_reply:
                 reply_surface = font.render(salame_reply, True, BLACK)
                 reply_rect = reply_surface.get_rect()
-                reply_rect.midbottom = (width // 2, height - 100)  
+                reply_rect.midbottom = (width//2, height - 100)  
                 screen.blit(reply_surface, reply_rect)
 
         pygame_widgets.update(events)
         pygame.display.update()
+        
