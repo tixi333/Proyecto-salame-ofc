@@ -35,6 +35,11 @@ with open("health.txt", "r") as f:
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
+#-------------------acceder a una imagen ------------------------------------
+def get_path(filename):
+    path = f"salame/food_main/{filename}"
+    path = os.path.abspath(path)
+    return path
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class salame:
     def __init__(self, current_health=current_health):
@@ -161,25 +166,25 @@ money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
 
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
-def progress():
-    return salame.health
-health_bar = ProgressBar(
-    screen,
-    600,                
-    15,       
-    180,               
-    30,                
-    min=0,
-    max=100,
-    initial=0,
-    progress=progress,
-    borderColour=BLACK,
-    fillColour=GREEN,
-    backgroundColour=GRAY,
-    radius=10,
-    borderThickness=3,
-    curved=True
-    )
+#def progress():
+ #   return salame.health
+#health_bar = ProgressBar(
+ #   screen,
+  #  600,                
+   # 15,       
+   # 180,               
+    #30,                
+    #min=0,
+    #max=100,
+    #initial=0,
+    #progress=progress,
+    #borderColour=BLACK,
+    #fillColour=GREEN,
+    #backgroundColour=GRAY,
+    #radius=10,
+    #borderThickness=3,
+    #curved=True
+    #)
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
@@ -210,7 +215,7 @@ def read_page(page):
             if i >= start_line + ITEMS_PER_PAGE:
                 break
             name, image_name, health, value = line.strip().split(" | ")
-            foods_on_page.append(food(name, image_name, int(health), int(value)))
+            foods_on_page.append(food(name, get_path(image_name), int(health), int(value)))
     return foods_on_page
 #------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
@@ -301,7 +306,7 @@ while running:
     for event in events:
         if event.type == pygame.QUIT:
             with open("lasttime.txt", "w") as f:
-                f.write(time.monotonic())
+                f.write(str(time.monotonic()))
             with open("health.txt", "w") as f:
                 f.write(str(salame.health))
             running = False
