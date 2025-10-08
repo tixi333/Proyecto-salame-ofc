@@ -1,13 +1,14 @@
 import pygame, pygame_widgets, os, time, openai
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
-from pygame_widgets.progressbar import ProgressBar
+import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=api_key)
+
 # seteo inicial
 pygame.init()
-
-width = 800
-height = 600
-screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
+screen = pygame.display.set_mode((width, height))  # seteo tamaÃ±o pantalla
 # colores
 WHITE = (245, 246, 252)
 BLACK = (30, 30, 35)
@@ -222,23 +223,14 @@ def read_page(page):
 salame_reply = ""
 def ask_salame():
     global salame_reply
-    text = textbox.getText()
-    textbox.setText("")
-    messages_with_instructions = [
-    {"role": "system", "content":  "You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep responses formatted as a single string, keeping it under 25 words, and answer in the same language as the input."},
-    {"role": "user", "content": text},
-]
-
-    response = client.chat.completions.create(
-    model="gpt-5-mini",
-    messages=messages_with_instructions,
+    client = OpenAI()
+    response = client.responses.create(
+        model="gpt-4o",
+        instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
+        input=textbox.getText()
 )
-     
-    if response and response.choices:
-        salame_reply = str(response.choices[0].message.content.strip())
-    else:
-        salame_reply = "..."
-
+    salame_reply = response.text.strip()
+    return
 
     
 textbox = TextBox(
@@ -395,9 +387,10 @@ while running:
         if current_background == GREEN:
             textbox.show()
             if salame_reply:
-                flag_button(salame_reply)
-        else:
-            textbox.hide()
+                reply_surface = font.render(salame_reply, True, BLACK)
+                reply_rect = reply_surface.get_rect()
+                reply_rect.midbottom = (width//2, height - 100)  
+                screen.blit(reply_surface, reply_rect)
 
         pygame_widgets.update(events)
         pygame.display.update()
