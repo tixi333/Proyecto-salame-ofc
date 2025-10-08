@@ -1,14 +1,17 @@
 import pygame, pygame_widgets, os
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
-import openai
-from openai import OpenAI
+import openai 
 
-client = OpenAI(api_key=api_key)
+client = OpenAI()
 
 # seteo inicial
 pygame.init()
-screen = pygame.display.set_mode((width, height))  # seteo tamaÃ±o pantalla
+
+width = 800
+height = 600
+
+screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
 # colores
 WHITE = (245, 246, 252)
 BLACK = (30, 30, 35)
@@ -71,7 +74,6 @@ class food:
             )
             self.button_pos = pos
         else:
-            # same pos as last frame â€” just show the existing button
             self.button.show()
 
     def feed_or_buy(self):
@@ -186,7 +188,6 @@ salame_reply = ""
 text = ""
 def output():
     global salame_reply
-    client = OpenAI()
     response = client.responses.create(
         model="gpt-4o",
         instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
@@ -258,6 +259,8 @@ while running:
     clear_buttons()
     events = pygame.event.get()
     for event in events:
+        if event.type == pygame.QUIT:
+            running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
@@ -339,7 +342,7 @@ while running:
             if salame_reply:
                 reply_surface = font.render(salame_reply, True, BLACK)
                 reply_rect = reply_surface.get_rect()
-                reply_rect.midbottom = (width//2, height - 100)  
+                reply_rect.midbottom = (width // 2, height - 100)  
                 screen.blit(reply_surface, reply_rect)
 
         pygame_widgets.update(events)
