@@ -60,23 +60,17 @@ def guardar_record(puntaje, ruta="Mini_Juego_LLC/record.txt"):
 
 def cargar_imagenes():
     jugador_img = pygame.image.load('Mini_juego_LLC/imagenes/salame.png').convert_alpha()
-    jugador_img = pygame.transform.scale(jugador_img, (50, 50))
+    jugador_img = pygame.transform.scale(jugador_img, (60,60))
     comidas_imgs = [
         pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/imagenes/comida{i+1}.png").convert_alpha(), (50, 50))
         for i in range(4)
     ]
-    comida_mala_img = pygame.transform.scale(pygame.image.load("Mini_Juego_LLC/imagenes/comida_mala.png").convert_alpha(), (40, 40))
+    comida_mala_img = pygame.transform.scale(pygame.image.load("Mini_Juego_LLC/imagenes/comida_mala.png").convert_alpha(), (50, 50))
     #-------- fondo
-    folder = "Mini_Juego_LLC/fondo"
-    background_imgs = []
+    background_img = pygame.image.load("Mini_Juego_LLC/fondo/fondo.png").convert()
+    background_img = pygame.transform.scale(background_img, (ANCHO, ALTO))
     
-    for name in sorted(os.listdir(folder)):
-        if name.endswith(".png") or name.endswith(".jpg"):
-            img = pygame.image.load(os.path.join(folder, name)).convert()
-            img = pygame.transform.scale(img, (ANCHO, ALTO))
-            background_imgs.append(img)
-    
-    return jugador_img, comidas_imgs, comida_mala_img, background_imgs
+    return jugador_img, comidas_imgs, comida_mala_img, background_img
 
 def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
     jugador_rect = jugador_img.get_rect()
@@ -197,9 +191,9 @@ def actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vid
         comida_mala_rect.y = random.randint(-600, -40)
     return comida_mala_rect, vidas
 
-def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over,record, background_imgs, current_bg_frame):
+def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over,record, background_img):
     pygame.draw.rect(pantalla, (0, 200, 0), suelo)
-    pantalla.blit(background_imgs[current_bg_frame], (0, 0))
+    pantalla.blit(background_img, (0, 0))
     pantalla.blit(jugador_img, jugador_rect)
 
     
@@ -222,7 +216,7 @@ def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img
 # --- Main ---
 def main():
     pantalla, fuente, fuente_grande, clock = inicializar()
-    jugador_img, comidas_imgs, comida_mala_img, background_imgs = cargar_imagenes()
+    jugador_img, comidas_imgs, comida_mala_img, background_img = cargar_imagenes()
     jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
     pantalla_inicio(pantalla, fuente)
     velocidad_y = 0
@@ -236,9 +230,7 @@ def main():
     game_over = False
     record= cargar_record()
     
-    current_bg_frame = 0
-    bg_frame_rate = 6
-    bg_timer = 0
+
     
     while True:
         reiniciar_juego = manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect)
@@ -260,14 +252,9 @@ def main():
             comida_mala_rect, vidas = actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas)
             if vidas <= 0:
                 game_over = True
-
-        bg_timer += 1
-        if bg_timer >= FPS // bg_frame_rate:
-            bg_timer = 0
-            current_bg_frame = (current_bg_frame + 1) % len(background_imgs)
             
         dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect,
-        fuente, fuente_grande, puntaje, vidas, game_over, record, background_imgs,current_bg_frame)
+        fuente, fuente_grande, puntaje, vidas, game_over, record, background_img)
         clock.tick(FPS)
 
 if __name__ == "__main__":
