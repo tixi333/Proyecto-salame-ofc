@@ -336,7 +336,16 @@ while running:
         screen.fill(WHITE)
         screen.blit(i_text, i_rect)
     else:
-        screen.fill(backgrounds[index])
+        if current_background == BLUE:
+            cocina = pygame.image.load("salame\\cocina.png").convert()
+            cocina = pygame.transform.scale(cocina, (width, height))
+            screen.blit(cocina, (0, 0))
+        else:
+            fondo_general = pygame.image.load("salame\\fondo.png").convert()
+            fondo_general = pygame.transform.scale(fondo_general, (width, height))
+            screen.blit(fondo_general, (0, 0))
+            
+            
         salame.draw(screen)
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
@@ -369,7 +378,8 @@ while running:
                             flag_button("No tienes suficiente dinero")
                         elif button_flag_type == "max food":
                             flag_button("No puedes comprar más comida")
-            else:         
+            else:
+                
                 if not bought_food:
                     with open("food_bought.txt", "r") as f:
                         if os.path.getsize("food_bought.txt") > 0:

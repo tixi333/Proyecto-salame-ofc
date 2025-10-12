@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import time
+import os
 
 ANCHO, ALTO = 800, 600
 BLANCO = (255, 255, 255)
@@ -61,11 +62,21 @@ def cargar_imagenes():
     jugador_img = pygame.image.load('Mini_juego_LLC/imagenes/salame.png').convert_alpha()
     jugador_img = pygame.transform.scale(jugador_img, (50, 50))
     comidas_imgs = [
-        pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/imagenes/comida{i+1}.png").convert_alpha(), (40, 40))
+        pygame.transform.scale(pygame.image.load(f"Mini_Juego_LLC/imagenes/comida{i+1}.png").convert_alpha(), (50, 50))
         for i in range(4)
     ]
     comida_mala_img = pygame.transform.scale(pygame.image.load("Mini_Juego_LLC/imagenes/comida_mala.png").convert_alpha(), (40, 40))
-    return jugador_img, comidas_imgs, comida_mala_img
+    #-------- fondo
+    folder = "Mini_Juego_LLC/fondo"
+    background_imgs = []
+    
+    for name in sorted(os.listdir(folder)):
+        if name.endswith(".png") or name.endswith(".jpg"):
+            img = pygame.image.load(os.path.join(folder, name)).convert()
+            img = pygame.transform.scale(img, (ANCHO, ALTO))
+            background_imgs.append(img)
+    
+    return jugador_img, comidas_imgs, comida_mala_img, background_imgs
 
 def crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img):
     jugador_rect = jugador_img.get_rect()
@@ -186,20 +197,23 @@ def actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vid
         comida_mala_rect.y = random.randint(-600, -40)
     return comida_mala_rect, vidas
 
-def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over,record):
-    pantalla.fill(BLANCO)
-    pantalla.blit(jugador_img, jugador_rect)
+def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect, fuente, fuente_grande, puntaje, vidas, game_over,record, background_imgs, current_bg_frame):
     pygame.draw.rect(pantalla, (0, 200, 0), suelo)
+    pantalla.blit(background_imgs[current_bg_frame], (0, 0))
+    pantalla.blit(jugador_img, jugador_rect)
+
+    
     for img, rect, _ in comidas:
         pantalla.blit(img, rect)
     pantalla.blit(comida_mala_img, comida_mala_rect)
-    texto_record=fuente.render(f"Record: {record}", True, NEGRO)
+    texto_record=fuente.render(f"Record: {record}", True, BLANCO)
     pantalla.blit(texto_record, (ANCHO // 2 - texto_record.get_width() // 2, 10))
-    texto_puntaje = fuente.render(f"Puntos: {puntaje}", True, NEGRO)
+    texto_puntaje = fuente.render(f"Puntos: {puntaje}", True, BLANCO)
     pantalla.blit(texto_puntaje, (ANCHO - 150, 10))
-    texto_vidas = fuente.render(f"Vidas: {vidas}", True, ROJO)
+    texto_vidas = fuente.render(f"Vidas: {vidas}", True, BLANCO)
     pantalla.blit(texto_vidas, (10, 10))
     if game_over:
+        pantalla.fill(BLANCO)
         mostrar_texto_centrado("GAME OVER", fuente_grande, ROJO, pantalla)
         mostrar_texto_centrado(f"Puntaje final: {puntaje}", fuente, NEGRO, pantalla, offset_y=60)
         mostrar_texto_centrado("Presiona cualquier tecla para reiniciar", fuente, NEGRO, pantalla, offset_y=120)
@@ -208,7 +222,7 @@ def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img
 # --- Main ---
 def main():
     pantalla, fuente, fuente_grande, clock = inicializar()
-    jugador_img, comidas_imgs, comida_mala_img = cargar_imagenes()
+    jugador_img, comidas_imgs, comida_mala_img, background_imgs = cargar_imagenes()
     jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
     pantalla_inicio(pantalla, fuente)
     velocidad_y = 0
@@ -221,6 +235,11 @@ def main():
     vidas = 3
     game_over = False
     record= cargar_record()
+    
+    current_bg_frame = 0
+    bg_frame_rate = 6
+    bg_timer = 0
+    
     while True:
         reiniciar_juego = manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect)
         if reiniciar_juego:
@@ -242,8 +261,13 @@ def main():
             if vidas <= 0:
                 game_over = True
 
+        bg_timer += 1
+        if bg_timer >= FPS // bg_frame_rate:
+            bg_timer = 0
+            current_bg_frame = (current_bg_frame + 1) % len(background_imgs)
+            
         dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect,
-        fuente, fuente_grande, puntaje, vidas, game_over, record)
+        fuente, fuente_grande, puntaje, vidas, game_over, record, background_imgs,current_bg_frame)
         clock.tick(FPS)
 
 if __name__ == "__main__":
