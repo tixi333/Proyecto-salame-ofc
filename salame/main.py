@@ -1,14 +1,14 @@
+
 import pygame, pygame_widgets, os, time, openai
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
-import openai
-from openai import OpenAI
-
-client = OpenAI(api_key=api_key)
-
+from pygame_widgets.progressbar import ProgressBar
 # seteo inicial
 pygame.init()
-screen = pygame.display.set_mode((width, height))  # seteo tamaÃ±o pantalla
+
+width = 800
+height = 600
+screen = pygame.display.set_mode((width, height))  # seteo tamaño pantalla
 # colores
 WHITE = (245, 246, 252)
 BLACK = (30, 30, 35)
@@ -186,6 +186,7 @@ health_bar = ProgressBar(
     incompletedColour=GRAY,
     )
 health_bar.show()
+
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = [YELLOW, BLUE, GREEN]
@@ -223,14 +224,23 @@ def read_page(page):
 salame_reply = ""
 def ask_salame():
     global salame_reply
-    client = OpenAI()
-    response = client.responses.create(
-        model="gpt-4o",
-        instructions="You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep your responses under 25 words, and answer in whatever language the input was given in.",
-        input=textbox.getText()
+    text = textbox.getText()
+    textbox.setText("")
+    messages_with_instructions = [
+    {"role": "system", "content":  "You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep responses formatted as a single string, keeping it under 25 words, and answer in the same language as the input."},
+    {"role": "user", "content": text},
+]
+
+    response = client.chat.completions.create(
+    model="gpt-5-mini",
+    messages=messages_with_instructions,
 )
-    salame_reply = response.text.strip()
-    return
+     
+    if response and response.choices:
+        salame_reply = str(response.choices[0].message.content.strip())
+    else:
+        salame_reply = "..."
+
 
     
 textbox = TextBox(
@@ -344,8 +354,7 @@ while running:
             fondo_general = pygame.image.load("salame\\fondo.png").convert()
             fondo_general = pygame.transform.scale(fondo_general, (width, height))
             screen.blit(fondo_general, (0, 0))
-            
-            
+        
         salame.draw(screen)
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
@@ -378,8 +387,7 @@ while running:
                             flag_button("No tienes suficiente dinero")
                         elif button_flag_type == "max food":
                             flag_button("No puedes comprar más comida")
-            else:
-                
+            else:         
                 if not bought_food:
                     with open("food_bought.txt", "r") as f:
                         if os.path.getsize("food_bought.txt") > 0:
@@ -397,11 +405,9 @@ while running:
         if current_background == GREEN:
             textbox.show()
             if salame_reply:
-                reply_surface = font.render(salame_reply, True, BLACK)
-                reply_rect = reply_surface.get_rect()
-                reply_rect.midbottom = (width//2, height - 100)  
-                screen.blit(reply_surface, reply_rect)
+                flag_button(salame_reply)
+        else:
+            textbox.hide()
 
         pygame_widgets.update(events)
         pygame.display.update()
-        
