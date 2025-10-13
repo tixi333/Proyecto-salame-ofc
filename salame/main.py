@@ -42,11 +42,25 @@ with open("health.txt", "r") as f:
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
+money_value = 0
+with open("money.txt", "r") as m:
+    money_value_str = m.readline().strip()
+    if money_value_str:
+        money_value = int(money_value_str) 
+    else:
+        money_value = 0
 #-------------------acceder a una imagen --------------------------------------------------------------------
 def get_path(filename):
-    path = f"salame/food_main/{filename}"
+    path = f"salame/files_main/{filename}"
     path = os.path.abspath(path)
     return path
+#-------------------funcion renderizar plata-------------------------
+def render_money():
+    global money_value
+    text_surface = font.render(str(money_value), True, BLACK)
+    rect = text_surface.get_rect()
+    rect.topleft = (55, 15)
+    return text_surface, rect
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class salame:
     def __init__(self, current_health=current_health):
@@ -99,17 +113,12 @@ class food:
             self.button.show()
 
     def feed_or_buy(self):
-        global button_flag_state, button_flag_type, bought_food, salame, buymenu
+        global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value
         if buymenu:
-            with open("money.txt", "r") as f:
-                money = int(f.read().strip())
-            if money >= self.value:
+            if money_value >= self.value:
                 if len(bought_food) < 10:
-                    money -= self.value
-                    with open("money.txt", "w") as f:
-                        f.write(str(money))
-                    with open("food_bought.txt", "a") as f:
-                        f.write(f"{self.name} | {self.image_name} | {self.health} | {self.value}\n")
+                    money_value -= self.value
+                    money, money_text_rect = render_money()
                     new_rect = pygame.Rect(0, 0, 85, 85)
                     new_rect.midbottom = (width // 2, height)
                     bought_item = food(self.name, self.image_name, self.health, self.value, new_rect)
@@ -121,14 +130,11 @@ class food:
                 button_flag_state = True
                 button_flag_type = "no money"
     
-        elif current_background == BLUE:
+        elif current_background == cocina:
             salame.health = salame.health + self.health
             if salame.health > 100:
                 salame.health = 100
             bought_food.remove(self)
-            with open("food_bought.txt", "w") as f:
-                for item in bought_food:
-                    f.write(f"{item.name} | {item.image_name} | {item.health} | {item.value}\n")
 
     def hide(self):
         self.button.hide()
@@ -171,6 +177,12 @@ money_image = pygame.image.load("coin.png").convert_alpha()
 money_image = pygame.transform.scale(money_image, (40, 40))
 money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
+money, money_text_rect = render_money()
+#fondos
+cocina = pygame.image.load(get_path('cocina.png')).convert()
+cocina = pygame.transform.scale(cocina, (width, height))
+fondo_general = pygame.image.load(get_path('fondo.png')).convert()
+fondo_general = pygame.transform.scale(fondo_general, (width, height))
 
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
 def progress():
@@ -189,12 +201,14 @@ health_bar.show()
 
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
-backgrounds = [YELLOW, BLUE, GREEN]
+backgrounds = {0 : cocina, 1: fondo_general, 2: fondo_general}
 index = 0
 
 # flags
 show_info = False
 buymenu = False
+
+
 
 # para manejar la comida comprada
 food_index = 0
@@ -233,7 +247,7 @@ def ask_salame():
 
     response = client.chat.completions.create(
     model="gpt-5-mini",
-    messages=messages_with_instructions,
+    messages=messages_with_instructions
 )
      
     if response and response.choices:
@@ -314,8 +328,10 @@ while running:
             with open("food_bought.txt", "w") as f:
                 for i in bought_food:
                     f.write(f"{i.name} | {i.image_name} | {i.health} | {i.value}\n")
+            with open('money.txt', 'w') as f:
+                f.write(str(money_value))
             running = False
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
             elif event.key == pygame.K_RIGHT:
@@ -323,20 +339,20 @@ while running:
             elif event.key == pygame.K_i:
                 show_info = not show_info
             elif event.key == pygame.K_b:
-                if backgrounds[index] == BLUE:
+                if index == 0:
                     buymenu = not buymenu
             elif event.key == pygame.K_a:
                 if buymenu:
                     current_page = (current_page - 1) % total_pages
-                elif backgrounds[index] == BLUE:
+                elif index == 0 and bought_food:
                     food_index = (food_index - 1) % len(bought_food)
             elif event.key == pygame.K_d:
                 if buymenu:
                     current_page = (current_page + 1) % total_pages
-                elif backgrounds[index] == BLUE:
+                elif index == 0 and bought_food:
                     food_index = (food_index + 1) % len(bought_food)
 
-    current_background = backgrounds[index]
+    current_background = backgrounds.get(index)
 
     if button_flag_state and button_flag is not None:
         pygame_widgets.update(events)
@@ -345,30 +361,19 @@ while running:
     elif show_info:
         screen.fill(WHITE)
         screen.blit(i_text, i_rect)
+        pygame.display.update() 
+        continue
     else:
-        if current_background == BLUE:
-            cocina = pygame.image.load("salame\\cocina.png").convert()
-            cocina = pygame.transform.scale(cocina, (width, height))
-            screen.blit(cocina, (0, 0))
-        else:
-            fondo_general = pygame.image.load("salame\\fondo.png").convert()
-            fondo_general = pygame.transform.scale(fondo_general, (width, height))
-            screen.blit(fondo_general, (0, 0))
-        
+        screen.blit(current_background, (0, 0))
         salame.draw(screen)
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
         health_bar.show()
         screen.blit(info_text, info_rect)
-        with open("money.txt", "r") as m:
-            money = m.readline()
-        money = font.render(money, True, BLACK)
-        money_text_rect = money.get_rect()
-        money_text_rect.topleft = (55, 15)
         screen.blit(money, money_text_rect)
         screen.blit(money_image, money_image_rect)
 
-        if current_background == BLUE:
+        if current_background == cocina:  
             if buymenu:
                 screen.fill(WHITE)
                 health_bar.hide()
@@ -401,8 +406,8 @@ while running:
                     bought_food[food_index].draw()
                 else:
                     screen.blit(no_food_text, no_food_rect)
-        
-        if current_background == GREEN:
+
+        if current_background == fondo_general and index == 1:
             textbox.show()
             if salame_reply:
                 flag_button(salame_reply)
