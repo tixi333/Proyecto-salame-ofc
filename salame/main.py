@@ -62,7 +62,7 @@ def render_money():
     rect.topleft = (55, 15)
     return text_surface, rect
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
-class salame:
+class Salame:
     def __init__(self, current_health=current_health):
         self.health = current_health
         self.happiness = 100
@@ -75,9 +75,9 @@ class salame:
         surface.blit(self.image, self.rect)
 
 # instancia salame
-salame = salame()
+salame = Salame()
 
-class food:
+class Food:
     def __init__(self, name, image_name, health, value, rect=None):
         self.name = name
         self.image_name = image_name
@@ -86,7 +86,7 @@ class food:
         self.image = pygame.image.load(image_name).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
         if rect is None:
-            self.rect = pygame.Rect(10, 20, 85, 85)
+            self.rect = pygame.Rect(width // 2 - 42, height - 100, 85, 85)
         else:
             self.rect = rect.copy()
 
@@ -121,7 +121,7 @@ class food:
                     money, money_text_rect = render_money()
                     new_rect = pygame.Rect(0, 0, 85, 85)
                     new_rect.midbottom = (width // 2, height)
-                    bought_item = food(self.name, self.image_name, self.health, self.value, new_rect)
+                    bought_item = Food(self.name, self.image_name, self.health, self.value, new_rect)
                     bought_food.append(bought_item)
                 else:
                     button_flag_state = True
@@ -201,7 +201,7 @@ health_bar.show()
 
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
-backgrounds = {0 : cocina, 1: fondo_general, 2: fondo_general}
+backgrounds = [cocina, fondo_general, fondo_general]
 index = 0
 
 # flags
@@ -231,7 +231,7 @@ def read_page(page):
             if i >= start_line + ITEMS_PER_PAGE:
                 break
             name, image_name, health, value = line.strip().split(" | ")
-            foods_on_page.append(food(name, get_path(image_name), int(health), int(value)))
+            foods_on_page.append(Food(name, get_path(image_name), int(health), int(value)))
     return foods_on_page
 #------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
@@ -272,6 +272,12 @@ textbox = TextBox(
     borderThickness=3
 )
 textbox.hide()
+
+#--------------------------------------------------botones de juegos-----------------------------
+class GameButton:
+    def __init__(self, type=None):
+        self.type = type
+
 
 #------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
@@ -352,7 +358,7 @@ while running:
                 elif index == 0 and bought_food:
                     food_index = (food_index + 1) % len(bought_food)
 
-    current_background = backgrounds.get(index)
+    current_background = backgrounds[index]
 
     if button_flag_state and button_flag is not None:
         pygame_widgets.update(events)
@@ -398,7 +404,7 @@ while running:
                         if os.path.getsize("food_bought.txt") > 0:
                             for i in f:
                                 name, image_name, health, value = i.strip().split(" | ")
-                                bought_food.append(food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height // 2 - 42, 85, 85)))
+                                bought_food.append(Food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height - 100, 85, 85)))
                 if bought_food:
                     screen.blit(arrowright_bottom, arrowright_bottom_rect)
                     screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
@@ -413,6 +419,9 @@ while running:
                 flag_button(salame_reply)
         else:
             textbox.hide()
+        
+        if current_background == fondo_general and index == 2:
+            pass
 
         pygame_widgets.update(events)
         pygame.display.update()
