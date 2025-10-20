@@ -1,8 +1,24 @@
+import os
 import pygame
 
 pygame.init()
 
-font20 = pygame.font.Font('freesansbold.ttf', 20)
+def load_font(path_or_name, size):
+    try:
+        if os.path.isabs(path_or_name) or os.path.exists(path_or_name):
+            return pygame.font.Font(path_or_name, size)
+        rel = os.path.join(os.path.dirname(__file__), path_or_name)
+        if os.path.exists(rel):
+            return pygame.font.Font(rel, size)
+        print(f"Advertencia: fuente '{path_or_name}' no encontrada. Usando fuente por defecto.")
+        return pygame.font.Font(None, size)
+    except Exception as e:
+        print(f"Error cargando fuente '{path_or_name}': {e}. Usando fuente por defecto.")
+        return pygame.font.Font(None, size)
+
+
+font_menu = load_font('monogram-extended.ttf', 30) 
+font20 = load_font('freesansbold.ttf', 20)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -14,8 +30,23 @@ pygame.display.set_caption("Ping Poung")
 
 clock = pygame.time.Clock()
 FPS = 30
-font_menu = pygame.font.Font(r'C:\Users\Usuario\Documents\GitHub\Proyecto-salame-ofc\monogram-extended.ttf', 30)
-font20 = pygame.font.Font('freesansbold.ttf', 20) 
+
+salame_image = None
+try:
+    possible_paths = [
+        'salame.png',
+        os.path.join(os.path.dirname(__file__), 'salame.png')
+    ]
+    for p in possible_paths:
+        if os.path.exists(p):
+            salame_image = pygame.image.load(p).convert_alpha()
+            break
+    if salame_image is None:
+        print("Aviso: no se encontró 'salame.png' en las rutas esperadas.")
+except Exception as e:
+    print("Aviso: no se pudo cargar 'salame.png'. Asegúrate de que el archivo existe en la carpeta del script.")
+    print("Error:", e)
+    salame_image = None
 
 def show_start_screen():
     running = True
@@ -33,6 +64,9 @@ def show_start_screen():
         pve_rect = pve_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 40))
         screen.blit(pve_text, pve_rect)
 
+        esc_text = font20.render("[Esc] Menu", True, WHITE)
+        screen.blit(esc_text, (10, HEIGHT - 30))
+
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -43,21 +77,29 @@ def show_start_screen():
                     return "PVP"
                 elif event.key == pygame.K_2:
                     return "PVE"
-    esc_text = font20.render("[Esc] Menu", True, WHITE)
-    screen.blit(esc_text, (10, HEIGHT - 30))
+    return None
 
 class Striker:
-    def __init__(self, posx, posy, width, height, speed, color):
+    def __init__(self, posx, posy, width, height, speed, color, image=None):
         self.posx = posx
         self.posy = posy
         self.width = width
         self.height = height
         self.speed = speed
         self.color = color
+        self.image = image 
+        if self.image:
+            try:
+                self.image = pygame.transform.scale(self.image, (self.width, self.height))
+            except Exception:
+                pass
         self.geekRect = pygame.Rect(posx, posy, width, height)
 
     def display(self):
-        self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
+        if self.image:
+            screen.blit(self.image, (self.posx, self.posy))
+        else:
+            self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
 
     def update(self, yFac):
         self.posy = self.posy + self.speed * yFac
@@ -124,23 +166,24 @@ class Ball:
         self.color = color
         self.xFac = 1
         self.yFac = -1
-        self.ball = pygame.draw.circle(screen, self.color, (self.posx, self.posy), self.radius)
         self.firstTime = 1
+        self.ballRect = pygame.Rect(self.posx - self.radius, self.posy - self.radius, self.radius*2, self.radius*2)
 
     def display(self):
-        self.ball = pygame.draw.circle(screen, self.color, (self.posx, self.posy), self.radius)
+        pygame.draw.circle(screen, self.color, (int(self.posx), int(self.posy)), self.radius)
+        self.ballRect = pygame.Rect(int(self.posx) - self.radius, int(self.posy) - self.radius, self.radius*2, self.radius*2)
 
     def update(self):
         self.posx += self.speed * self.xFac
         self.posy += self.speed * self.yFac
 
-        if self.posy <= 0 or self.posy >= HEIGHT:
+        if self.posy - self.radius <= 0 or self.posy + self.radius >= HEIGHT:
             self.yFac *= -1
 
-        if self.posx <= 0 and self.firstTime:
+        if self.posx - self.radius <= 0 and self.firstTime:
             self.firstTime = 0
             return 1
-        elif self.posx >= WIDTH and self.firstTime:
+        elif self.posx + self.radius >= WIDTH and self.firstTime:
             self.firstTime = 0
             return -1
         else:
@@ -156,13 +199,19 @@ class Ball:
         self.xFac *= -1
 
     def getRect(self):
-        return self.ball
+        return self.ballRect
 
 def main():
-    while True:  
+    while True:
         mode = show_start_screen()
+        if mode is None:
+            break
 
-        geek1 = Striker(20, 0, 10, 100, 10, GREEN)
+        left_width, left_height = 50, 80  
+        if salame_image:
+            geek1 = Striker(20, 0, left_width, left_height, 10, GREEN, image=salame_image)
+        else:
+            geek1 = Striker(20, 0, 10, 100, 10, GREEN)
         if mode == "PVP":
             geek2 = Striker(WIDTH - 30, 0, 10, 100, 10, GREEN)
         else:
@@ -181,7 +230,7 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    return  
+                    return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
@@ -200,13 +249,13 @@ def main():
                         geek1YFac = 0
 
             if mode == "PVE":
-                diff = geek1Score - geek2Score  
+                diff = geek1Score - geek2Score
                 base_speed = 5
-                new_speed = base_speed + diff  
+                new_speed = base_speed + diff
                 if new_speed < 1:
-                    new_speed = 1  
+                    new_speed = 1
                 elif new_speed > 10:
-                    new_speed = 10 
+                    new_speed = 10
                 geek2.speed = new_speed
 
             if mode == "PVP":
@@ -215,7 +264,7 @@ def main():
                 geek2.update(ball)
 
             for geek in listOfGeeks:
-                if pygame.Rect.colliderect(ball.getRect(), geek.getRect()):
+                if ball.getRect().colliderect(geek.getRect()):
                     ball.hit()
             geek1.update(geek1YFac)
             point = ball.update()
