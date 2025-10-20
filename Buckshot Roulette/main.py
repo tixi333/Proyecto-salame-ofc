@@ -1,6 +1,8 @@
 import pygame
+import random
 from setup import init_pygame
 from resources import load_resources
+
 
 init_pygame()
 resources = load_resources()
@@ -40,10 +42,10 @@ class Button:
             else:
                 self.image = self.image1
                 self.hovered = False
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.rect.collidepoint(event.pos):
-                self.action()
+        if self.text == False:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(event.pos):
+                    self.action()
                 
 class Activate:
     def __init__(self,color1,color2,x,y,width,height,current_mode):
@@ -71,7 +73,7 @@ class Activate:
             else:
                 self.state = False
 
-def play ():
+def play_screen ():
     global actual_screen
     actual_screen = "play_screen"
 
@@ -102,7 +104,7 @@ button_activate = [
 ]
 
 buttons_menu = [
-    Button(resources["menu"]["text_play"][0],resources["menu"]["text_play"][1],90,250, play,"menu",False),
+    Button(resources["menu"]["text_play"][0],resources["menu"]["text_play"][1],90,250, play_screen,"menu",False),
     Button(resources["menu"]["text_options"][0],resources["menu"]["text_options"][1],115,300,options,"menu",False),
     Button(resources["menu"]["text_how2play"][0],resources["menu"]["text_how2play"][1],155,350,how2play,"menu",False)
     ]
@@ -116,6 +118,20 @@ buttons_options = [
 frame_index = 0
 frame_delay = 100
 last_update = pygame.time.get_ticks()
+def play():
+    screen.fill(resources["colors"][3])
+    cartuchos = []
+
+    cant_fogueo = random.randint(1,8)
+    n = 8 - cant_fogueo
+    cant_vivos = random.randint(1,n)
+
+    while cant_fogueo:
+        cartuchos.append(1)
+    while cant_vivos:
+        cartuchos.append(2)
+    
+    print(cartuchos)
 
 def draw(last_update,frame_index):
     if actual_screen == "main_screen":
@@ -170,8 +186,6 @@ def draw(last_update,frame_index):
     pygame.display.flip()
     return last_update, frame_index
 
-def play():
-    pass
 running = True
 
 while running:
