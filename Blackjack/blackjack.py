@@ -41,8 +41,8 @@ def mostrar_personaje_dialogo(mensaje):
     burbuja = pygame.Surface((burbuja_ancho, burbuja_alto))
     burbuja.fill(BLANCO)
 
-    burbuja_x = personaje_x - burbuja_ancho - 20
-    burbuja_y = personaje_y + 60
+    burbuja_x = personaje_x - burbuja_ancho // 2 + 100
+    burbuja_y = personaje_y - 20
     ventana.blit(burbuja, (burbuja_x, burbuja_y))
     ventana.blit(texto, (burbuja_x + 10, burbuja_y + 10))
 
@@ -59,13 +59,18 @@ def cargar_imagen(nombre):
     imagen = pygame.image.load(ruta)
     return pygame.transform.scale(imagen, (80, 120))
 
+def cargar_fondo ():
+    fondo = pygame.image.load("Blackjack/blackjack_mesa.png").convert()
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+    return fondo
+
 def pantalla_inicio():
     mostrar_texto = True
     tiempo_parpadeo = 500 
     ultimo_cambio = pygame.time.get_ticks()
 
     while True:
-        ventana.fill(VERDE)
+        ventana.blit(cargar_fondo(), (0,0))
 
         titulo = FUENTE.render("¡Cuida a tu salame! - Blackjack", True, BLANCO)
         ventana.blit(titulo, (ANCHO//2 - titulo.get_width()//2, ALTO//2 - 100))
@@ -144,7 +149,7 @@ def mostrar_controles():
         ]
     for i, linea in enumerate(instrucciones):
         y_pos = 50 + i * 75  
-        ventana.blit(cartel_base, (699, y_pos-48)) 
+        #ventana.blit(cartel_base, (699, y_pos-48)) 
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
@@ -167,7 +172,7 @@ def main():
     resultado = ""
 
     while True:
-        ventana.fill((0, 100, 0))  
+        ventana.blit(cargar_fondo(), (0,0))
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:

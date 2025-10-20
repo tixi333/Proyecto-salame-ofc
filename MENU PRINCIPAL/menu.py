@@ -1,4 +1,6 @@
 import pygame
+import subprocess
+import sys
 
 height= 600
 width = 800
@@ -20,14 +22,14 @@ text_options = font.render("options screen", True, grey)
 text_exit = font.render("ESC go back to menu", True, grey)
 text_exit = font.render("ESC - (go back)", True, grey)
 
-back = pygame.image.load("menu.jpg").convert()
+back = pygame.image.load("Menu (imagenes)\\menu.jpg").convert() 
 back_scale = pygame.transform.scale(back, (width, height)) 
 
-title = pygame.image.load("title.png").convert_alpha()
+title = pygame.image.load("Menu (imagenes)\\title.png").convert_alpha()
 title_scale = pygame.transform.scale(title,(500,100))
 title_scale_rect = title_scale.get_rect(center= (width//2, 100))
 
-back_buttons = pygame.image.load("frame3.png").convert()
+back_buttons = pygame.image.load("Menu (imagenes)\\frame3.png").convert()
 back_buttons_scale = pygame.transform.scale(back_buttons,(width, height))
 back_buttons_scale_rect = back_buttons_scale.get_rect(center= (width//2, height//2))
 
@@ -87,20 +89,20 @@ def show_credits_screen():
 
 ## -------------  Button set
 
-play1 = pygame.image.load("PLAY1 r.png").convert()
-play2 = pygame.image.load("PLAY2 r.png").convert()
+play1 = pygame.image.load("Menu (imagenes)\\PLAY1 r.png").convert()
+play2 = pygame.image.load("Menu (imagenes)\\PLAY2 r.png").convert()
 
 play1_scale = pygame.transform.scale(play1, (175,75))
 play2_scale = pygame.transform.scale(play2, (175,75))
 
-options1 = pygame.image.load("OPTIONS1 r.png").convert()
-options2 = pygame.image.load("OPTIONS2 r.png").convert()
+options1 = pygame.image.load("Menu (imagenes)\\OPTIONS1 r.png").convert()
+options2 = pygame.image.load("Menu (imagenes)\\OPTIONS2 r.png").convert()
 
 options1_scale = pygame.transform.scale(options1,(175,75))
 options2_scale = pygame.transform.scale(options2,(175,75))
 
-credits1 = pygame.image.load("CREDITS1 r.png").convert()
-credits2 = pygame.image.load("CREDITS2 R.png").convert()
+credits1 = pygame.image.load("Menu (imagenes)\\CREDITS1 r.png").convert()
+credits2 = pygame.image.load("Menu (imagenes)\\CREDITS2 R.png").convert()
 
 credits1_scale = pygame.transform.scale(credits1,(175,75))
 credits2_scale = pygame.transform.scale(credits2,(175,75))
@@ -134,9 +136,10 @@ while running:
             button.draw_button(screen)
             
     elif actual_screen == "play_screen":
-        screen.blit(back_buttons_scale,(0,0))
-        screen.blit(text_play,(100,100))
-        screen.blit(text_exit,(300,500))
+        subprocess.Popen([sys.executable, "salame\\main.py"])
+        #screen.blit(back_buttons_scale,(0,0))
+        #screen.blit(text_play,(100,100))
+        #screen.blit(text_exit,(300,500))
         
     elif actual_screen== "options_screen":
         screen.blit(back_buttons_scale,(0,0))
