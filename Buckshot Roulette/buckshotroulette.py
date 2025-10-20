@@ -7,11 +7,11 @@ black = (0,0,0)
 grey = (128,128,128)
 red = (139,0,0)
 
-pygame.init()
+pygame.init() #
 screen = pygame.display.set_mode((width,height))
 pygame.display.set_caption("Buckshot Roullete")  
 
-fontr = pygame.font.Font("EBGaramond-VariableFont_wght.ttf", 100)
+fontr = pygame.font.Font("EBGaramond-VariableFont_wght.ttf", 100) 
 #----------------- FONT
 font0 = pygame.font.Font("monogram-extended.ttf",20)
 font = pygame.font.Font("monogram-extended.ttf", 40) 
@@ -219,9 +219,6 @@ def show_play_screen():
     global actual_screen
     actual_screen = "play_screen"
 
-
-
-
 def show_options_screen():
     global actual_screen
     actual_screen = "options_screen"
@@ -275,6 +272,7 @@ running = True
 actual_screen = "main_screen"
 current_difficulty = "normal"
 #--------------- bucle
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -347,6 +345,7 @@ while running:
     elif actual_screen == "play_screen":   #screen
         screen.fill(black)
         screen.blit(text_play,(0,0))
+        play()
     elif actual_screen == "options_screen":   #screen
         screen.fill(black)
         screen.blit(text_options_difficulty, (50,200))

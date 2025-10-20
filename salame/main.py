@@ -1,5 +1,5 @@
 
-import pygame, pygame_widgets, os, time, openai
+import pygame, pygame_widgets, os, time, subprocess
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
 from pygame_widgets.progressbar import ProgressBar
@@ -60,7 +60,7 @@ def render_money():
     text_surface = font.render(str(money_value), True, BLACK)
     rect = text_surface.get_rect()
     rect.topleft = (55, 15)
-    return text_surface, rect
+    screen.blit(text_surface, rect)
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class Salame:
     def __init__(self, current_health=current_health):
@@ -78,17 +78,14 @@ class Salame:
 salame = Salame()
 
 class Food:
-    def __init__(self, name, image_name, health, value, rect=None):
+    def __init__(self, name, image_name, health, value, rect=pygame.Rect(358, 515, 85, 85)):
         self.name = name
         self.image_name = image_name
         self.health = health
         self.value = value
         self.image = pygame.image.load(image_name).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
-        if rect is None:
-            self.rect = pygame.Rect(width // 2 - 42, height - 100, 85, 85)
-        else:
-            self.rect = rect.copy()
+        self.rect = rect
 
     def draw(self):
         pos = (self.rect.x, self.rect.y, self.rect.width, self.rect.height)
@@ -118,7 +115,6 @@ class Food:
             if money_value >= self.value:
                 if len(bought_food) < 10:
                     money_value -= self.value
-                    money, money_text_rect = render_money()
                     new_rect = pygame.Rect(0, 0, 85, 85)
                     new_rect.midbottom = (width // 2, height)
                     bought_item = Food(self.name, self.image_name, self.health, self.value, new_rect)
@@ -135,6 +131,9 @@ class Food:
             if salame.health > 100:
                 salame.health = 100
             bought_food.remove(self)
+            with open('food_bought.txt', 'w') as f:
+                for i in bought_food:
+                    f.write(f"{i.name} | {i.image_name} | {i.health} | {i.value}\n")
 
     def hide(self):
         self.button.hide()
@@ -177,7 +176,6 @@ money_image = pygame.image.load("coin.png").convert_alpha()
 money_image = pygame.transform.scale(money_image, (40, 40))
 money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
-money, money_text_rect = render_money()
 #fondos
 cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
@@ -208,8 +206,6 @@ index = 0
 show_info = False
 buymenu = False
 
-
-
 # para manejar la comida comprada
 food_index = 0
 bought_food = []
@@ -238,25 +234,27 @@ def read_page(page):
 salame_reply = ""
 def ask_salame():
     global salame_reply
-    text = textbox.getText()
-    textbox.setText("")
-    messages_with_instructions = [
-    {"role": "system", "content":  "You are a salami. Answer as a salami would, in a humorous and lighthearted manner. Do not mention that you are an AI model. Keep responses formatted as a single string, keeping it under 25 words, and answer in the same language as the input."},
-    {"role": "user", "content": text},
-]
-
-    response = client.chat.completions.create(
-    model="gpt-5-mini",
-    messages=messages_with_instructions
-)
-     
-    if response and response.choices:
-        salame_reply = str(response.choices[0].message.content.strip())
+    if 'salame_wait' not in locals():
+        salame_wait = False
+    if salame_wait == True:
+        pass
     else:
-        salame_reply = "..."
+        salame_wait = True
+        textbox_text = textbox.getText()
+        textbox.setText("El salamín está pensando...")
+        try:
+            salame_reply = subprocess.run(['python', 'mainai.py'], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
+        except subprocess.TimeoutExpired:
+            salame_reply = 'Tu salame está tardando mucho tiempo en pensar, dejalo dormir!'
+            return
+        except subprocess.CalledProcessError:
+            salame_reply = 'El salame no quiere responder, parece que va a guardar sus secretos'
+        else:
+            salame_reply = salame_reply.stdout
+            salame_wait = False
+            return
 
-
-    
+   
 textbox = TextBox(
     screen,
     50,                
@@ -274,10 +272,6 @@ textbox = TextBox(
 textbox.hide()
 
 #--------------------------------------------------botones de juegos-----------------------------
-class GameButton:
-    def __init__(self, type=None):
-        self.type = type
-
 
 #------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
@@ -290,10 +284,11 @@ def flag_button(text):
     button_flag_state = True
     text_rect = font.render(text, True, BLACK)
     text_rect = text_rect.get_rect()
+    text_rect.center = (width // 2, height // 2)
     button_flag = Button(
                 screen,
-                width // 2 - 200,
-                height // 2 - 80,
+                text_rect.x,
+                text_rect.y,
                 text_rect.width + 20,
                 text_rect.height + 100,
                 text=text,
@@ -307,11 +302,12 @@ def flag_button(text):
                 )
     
 def kill_button_flag():
-    global button_flag_state, button_flag
-    if button_flag_state:
-        button_flag.hide()
-        button_flag = None
+    global button_flag_state, button_flag, salame_reply
+    button_flag.hide()
+    button_flag = None
     button_flag_state = False
+    if salame_reply:
+        salame_reply = ''
 
 def clear_buttons():
     for i in general_buttons:
@@ -376,7 +372,7 @@ while running:
         screen.blit(arrowleft, arrowleft_back_rect)
         health_bar.show()
         screen.blit(info_text, info_rect)
-        screen.blit(money, money_text_rect)
+        render_money()
         screen.blit(money_image, money_image_rect)
 
         if current_background == cocina:  
@@ -399,17 +395,16 @@ while running:
                         elif button_flag_type == "max food":
                             flag_button("No puedes comprar más comida")
             else:         
-                if not bought_food:
-                    with open("food_bought.txt", "r") as f:
-                        if os.path.getsize("food_bought.txt") > 0:
-                            for i in f:
-                                name, image_name, health, value = i.strip().split(" | ")
-                                bought_food.append(Food(name, image_name, int(health), int(value), pygame.Rect(width // 2 - 42, height - 100, 85, 85)))
                 if bought_food:
                     screen.blit(arrowright_bottom, arrowright_bottom_rect)
                     screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
                     general_buttons.append([bought_food[food_index]])
                     bought_food[food_index].draw()
+                elif os.path.getsize("food_bought.txt") > 1:
+                            with open("food_bought.txt", "r") as f:
+                                for i in f:
+                                    name, image_name, health, value = i.strip().split(" | ")
+                                    bought_food.append(Food(name, image_name, int(health), int(value)))
                 else:
                     screen.blit(no_food_text, no_food_rect)
 

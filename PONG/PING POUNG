@@ -12,8 +12,39 @@ WIDTH, HEIGHT = 900, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ping Poung")
 
-clock = pygame.time.Clock()    
+clock = pygame.time.Clock()
 FPS = 30
+font_menu = pygame.font.Font(r'C:\Users\Usuario\Documents\GitHub\Proyecto-salame-ofc\monogram-extended.ttf', 30)
+font20 = pygame.font.Font('freesansbold.ttf', 20) 
+
+def show_start_screen():
+    running = True
+    while running:
+        screen.fill(BLACK)
+        title_text = font_menu.render("PING POUNG", True, WHITE)
+        title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
+        screen.blit(title_text, title_rect)
+
+        pvp_text = font_menu.render("Press 1 for Player vs Player", True, WHITE)
+        pvp_rect = pvp_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(pvp_text, pvp_rect)
+
+        pve_text = font_menu.render("Press 2 for Player vs Bot", True, WHITE)
+        pve_rect = pve_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 40))
+        screen.blit(pve_text, pve_rect)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    return "PVP"
+                elif event.key == pygame.K_2:
+                    return "PVE"
+    esc_text = font20.render("[Esc] Menu", True, WHITE)
+    screen.blit(esc_text, (10, HEIGHT - 30))
 
 class Striker:
     def __init__(self, posx, posy, width, height, speed, color):
@@ -25,31 +56,64 @@ class Striker:
         self.color = color
         self.geekRect = pygame.Rect(posx, posy, width, height)
 
-        self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
-
     def display(self):
         self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
 
     def update(self, yFac):
-        self.posy = self.posy + self.speed*yFac
+        self.posy = self.posy + self.speed * yFac
 
         if self.posy <= 0:
             self.posy = 0
-
         elif self.posy + self.height >= HEIGHT:
-            self.posy = HEIGHT-self.height
+            self.posy = HEIGHT - self.height
 
-        self.geekRect = (self.posx, self.posy, self.width, self.height)
+        self.geekRect = pygame.Rect(self.posx, self.posy, self.width, self.height)
 
     def displayScore(self, text, score, x, y, color):
-        text = font20.render(text+str(score), True, color)
+        text = font20.render(text + str(score), True, color)
         textRect = text.get_rect()
         textRect.center = (x, y)
-
         screen.blit(text, textRect)
 
     def getRect(self):
         return self.geekRect
+
+class Bot:
+    def __init__(self, posx, posy, width, height, speed, color):
+        self.posx = posx
+        self.posy = posy
+        self.width = width
+        self.height = height
+        self.speed = speed
+        self.color = color
+        self.geekRect = pygame.Rect(posx, posy, width, height)
+
+    def display(self):
+        self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
+
+    def update(self, ball):
+        target_pos = ball.posy - self.height / 2
+        if abs(self.posy - target_pos) > 5:
+            if self.posy < target_pos:
+                self.posy += self.speed
+            else:
+                self.posy -= self.speed
+
+        if self.posy <= 0:
+            self.posy = 0
+        elif self.posy + self.height >= HEIGHT:
+            self.posy = HEIGHT - self.height
+
+        self.geekRect = pygame.Rect(self.posx, self.posy, self.width, self.height)
+
+    def getRect(self):
+        return self.geekRect
+
+    def displayScore(self, text, score, x, y, color):
+        text = font20.render(text + str(score), True, color)
+        textRect = text.get_rect()
+        textRect.center = (x, y)
+        screen.blit(text, textRect)
 
 class Ball:
     def __init__(self, posx, posy, radius, speed, color):
@@ -60,17 +124,15 @@ class Ball:
         self.color = color
         self.xFac = 1
         self.yFac = -1
-        self.ball = pygame.draw.circle(
-            screen, self.color, (self.posx, self.posy), self.radius)
+        self.ball = pygame.draw.circle(screen, self.color, (self.posx, self.posy), self.radius)
         self.firstTime = 1
 
     def display(self):
-        self.ball = pygame.draw.circle(
-            screen, self.color, (self.posx, self.posy), self.radius)
+        self.ball = pygame.draw.circle(screen, self.color, (self.posx, self.posy), self.radius)
 
     def update(self):
-        self.posx += self.speed*self.xFac
-        self.posy += self.speed*self.yFac
+        self.posx += self.speed * self.xFac
+        self.posy += self.speed * self.yFac
 
         if self.posy <= 0 or self.posy >= HEIGHT:
             self.yFac *= -1
@@ -85,8 +147,8 @@ class Ball:
             return 0
 
     def reset(self):
-        self.posx = WIDTH//2
-        self.posy = HEIGHT//2
+        self.posx = WIDTH // 2
+        self.posy = HEIGHT // 2
         self.xFac *= -1
         self.firstTime = 1
 
@@ -97,66 +159,85 @@ class Ball:
         return self.ball
 
 def main():
-    running = True
+    while True:  
+        mode = show_start_screen()
 
-    geek1 = Striker(20, 0, 10, 100, 10, GREEN)
-    geek2 = Striker(WIDTH-30, 0, 10, 100, 10, GREEN)
-    ball = Ball(WIDTH//2, HEIGHT//2, 7, 7, WHITE)
+        geek1 = Striker(20, 0, 10, 100, 10, GREEN)
+        if mode == "PVP":
+            geek2 = Striker(WIDTH - 30, 0, 10, 100, 10, GREEN)
+        else:
+            geek2 = Bot(WIDTH - 30, 0, 10, 100, 5, GREEN)
 
-    listOfGeeks = [geek1, geek2]
+        ball = Ball(WIDTH // 2, HEIGHT // 2, 7, 7, WHITE)
+        listOfGeeks = [geek1, geek2]
 
-    geek1Score, geek2Score = 0, 0
-    geek1YFac, geek2YFac = 0, 0
+        geek1Score, geek2Score = 0, 0
+        geek1YFac, geek2YFac = 0, 0
 
-    while running:
-        screen.fill(BLACK)
+        running = True
+        while running:
+            screen.fill(BLACK)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    geek2YFac = -1
-                if event.key == pygame.K_DOWN:
-                    geek2YFac = 1
-                if event.key == pygame.K_w:
-                    geek1YFac = -1
-                if event.key == pygame.K_s:
-                    geek1YFac = 1
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                    geek2YFac = 0
-                if event.key == pygame.K_w or event.key == pygame.K_s:
-                    geek1YFac = 0
-        for geek in listOfGeeks:
-            if pygame.Rect.colliderect(ball.getRect(), geek.getRect()):
-                ball.hit()
-        geek1.update(geek1YFac)
-        geek2.update(geek2YFac)
-        point = ball.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return  
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                    if event.key == pygame.K_UP:
+                        geek2YFac = -1
+                    if event.key == pygame.K_DOWN:
+                        geek2YFac = 1
+                    if event.key == pygame.K_w:
+                        geek1YFac = -1
+                    if event.key == pygame.K_s:
+                        geek1YFac = 1
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        geek2YFac = 0
+                    if event.key == pygame.K_w or event.key == pygame.K_s:
+                        geek1YFac = 0
 
-        if point == -1:
-            geek1Score += 1
-        elif point == 1:
-            geek2Score += 1
+            if mode == "PVE":
+                diff = geek1Score - geek2Score  
+                base_speed = 5
+                new_speed = base_speed + diff  
+                if new_speed < 1:
+                    new_speed = 1  
+                elif new_speed > 10:
+                    new_speed = 10 
+                geek2.speed = new_speed
 
-        if point:   
-            ball.reset()
+            if mode == "PVP":
+                geek2.update(geek2YFac)
+            else:
+                geek2.update(ball)
 
-        geek1.display()
-        geek2.display()
-        ball.display()
+            for geek in listOfGeeks:
+                if pygame.Rect.colliderect(ball.getRect(), geek.getRect()):
+                    ball.hit()
+            geek1.update(geek1YFac)
+            point = ball.update()
 
-        geek1.displayScore("Geek_1 : ", 
-                           geek1Score, 100, 20, WHITE)
-        geek2.displayScore("Geek_2 : ", 
-                           geek2Score, WIDTH-100, 20, WHITE)
+            if point == -1:
+                geek1Score += 1
+            elif point == 1:
+                geek2Score += 1
 
-        pygame.display.update()
-        clock.tick(FPS)     
+            if point:
+                ball.reset()
 
+            geek1.display()
+            geek2.display()
+            ball.display()
+
+            geek1.displayScore("Geek_1 : ", geek1Score, 100, 20, WHITE)
+            geek2.displayScore("Geek_2 : ", geek2Score, WIDTH - 100, 20, WHITE)
+
+            pygame.display.update()
+            clock.tick(FPS)
 
 if __name__ == "__main__":
     main()
     pygame.quit()
-
