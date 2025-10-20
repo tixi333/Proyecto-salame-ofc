@@ -1,5 +1,5 @@
 
-import pygame, pygame_widgets, os, time, subprocess
+import pygame, pygame_widgets, os, time, subprocess, sys
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
 from pygame_widgets.progressbar import ProgressBar
@@ -241,18 +241,20 @@ def ask_salame():
     else:
         salame_wait = True
         textbox_text = textbox.getText()
-        textbox.setText("El salamín está pensando...")
+        textbox.setText("El salamín está pensando... no escribas nada")
         try:
             salame_reply = subprocess.run(['python', 'mainai.py'], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
         except subprocess.TimeoutExpired:
-            salame_reply = 'Tu salame está tardando mucho tiempo en pensar, dejalo dormir!'
+            salame_reply = 'Tu salame quiere dormir!'
             return
         except subprocess.CalledProcessError:
-            salame_reply = 'El salame no quiere responder, parece que va a guardar sus secretos'
+            salame_reply = 'El salame va a guardar sus secretos'
         else:
             salame_reply = salame_reply.stdout
             salame_wait = False
             return
+        finally:
+            textbox.setText("")
 
    
 textbox = TextBox(
@@ -263,8 +265,8 @@ textbox = TextBox(
     60,                
     fontSize=28,
     font=font,
-    borderColour=(255, 0, 0),
-    textColour=(0, 200, 0),
+    borderColour=BLUE,
+    textColour=BLACK,
     onSubmit=ask_salame,
     radius=10,
     borderThickness=3
@@ -272,7 +274,61 @@ textbox = TextBox(
 textbox.hide()
 
 #--------------------------------------------------botones de juegos-----------------------------
+class GameButton:
+    def __init__(self, name, script_path, rect, image=None):
+        self.name = name
+        self.rect = rect
+        self.script_path = os.path.abspath(script_path)
+        self.button = self.button = Button(
+                screen,
+                int(self.rect.x),
+                int(self.rect.y),
+                int(self.rect.width),
+                int(self.rect.height),
+                text=str(self.name),  
+                fontSize=30,
+                onClick=self.run
+            )
+    def run(self):
+        command = [sys.executable, self.script_path]
+        if sys.platform == "win32":
+            DETACHED_PROCESS = 0x00000008
+            CREATE_NEW_PROCESS_GROUP = 0x00000200
+            subprocess.Popen(
+                command,
+                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                close_fds=True,
+            )
+            running = False
 
+        else:
+            subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,  
+                close_fds=True,
+            )
+            running = False
+
+    def hide(self):
+        self.button.hide()
+    def show(self):
+        self.button.show()
+
+lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(90, 140, 120, 90))
+blackjack = GameButton("Blackjack", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(90, 350, 120, 90))
+pong =  GameButton("Poung", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(590, 140, 120, 90))
+buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(590, 350, 120, 90))
+        
+
+#left_mid_rect = pygame.Rect(90, 245, 120, 90)
+#right_mid_rect = pygame.Rect(590, 245, 120, 90)
+        
 #------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
 button_flag_state = False
@@ -416,7 +472,16 @@ while running:
             textbox.hide()
         
         if current_background == fondo_general and index == 2:
-            pass
+            buckshot.show()
+            blackjack.show()
+            lluvia_comida.show()
+            pong.show()
+        else:
+            buckshot.hide()
+            blackjack.hide()
+            lluvia_comida.hide()
+            pong.hide()
+
 
         pygame_widgets.update(events)
         pygame.display.update()
