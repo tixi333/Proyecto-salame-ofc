@@ -134,16 +134,16 @@ nineteen = pygame.image.load("Buckshot Roulette/background_buckshot_roulette/19.
 nineteen_scale = pygame.transform.scale(nineteen,(width,height))
 #------------------ items
 
-lupa = pygame.image.load("Buckshot Roulette/items/lupa.png").convert() #
-adrenaline = pygame.image.load("Buckshot Roulette/items/adrenaline.png").convert() #
-bullet = pygame.image.load("Buckshot Roulette/items/bullet.png").convert() #
-shotgun = pygame.image.load("Buckshot Roulette/items/shotgun.png").convert() #
-cigarette = pygame.image.load("Buckshot Roulette/items/cigarette.png").convert() #
-burner_phone= pygame.image.load("Buckshot Roulette/items/burner_phone.png").convert()
-handcuff = pygame.image.load("Buckshot Roulette/items/handcuff.png").convert() #
-inverter = pygame.image.load("Buckshot Roulette/items/inverter.png").convert()
-jammer = pygame.image.load("Buckshot Roulette/items/jammer.png").convert() #
-
+#lupa = pygame.image.load("Buckshot Roulette/items/lupa.png").convert() # 
+#adrenaline = pygame.image.load("Buckshot Roulette/items/adrenaline.png").convert() #
+#bullet = pygame.image.load("Buckshot Roulette/items/bullet.png").convert() #
+#shotgun = pygame.image.load("Buckshot Roulette/items/shotgun.png").convert() #
+#cigarette = pygame.image.load("Buckshot Roulette/items/cigarette.png").convert() #
+#burner_phone= pygame.image.load("Buckshot Roulette/items/burner_phone.png").convert()
+#handcuff = pygame.image.load("Buckshot Roulette/items/handcuff.png").convert() #
+#inverter = pygame.image.load("Buckshot Roulette/items/inverter.png").convert()
+#jammer = pygame.image.load("Buckshot Roulette/items/jammer.png").convert() #
+#handsaw
 
 
 # ---------------------------
