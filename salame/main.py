@@ -167,9 +167,7 @@ no_food_rect.midbottom = (width // 2, height)
 info_text = font.render("Presiona <i> para info", True, BLACK)
 info_rect = info_text.get_rect()
 info_rect.topleft = (475, 10)
-i_text = font.render("iahygfjhjsgjhb", True, BLACK)
-i_rect = i_text.get_rect()
-i_rect.center = (width // 2, height // 2)
+i_text = ''
 
 #lo de plata
 money_image = pygame.image.load("coin.png").convert_alpha()
@@ -181,7 +179,10 @@ cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
 fondo_general = pygame.image.load(get_path('fondo.png')).convert()
 fondo_general = pygame.transform.scale(fondo_general, (width, height))
-
+#cuando un minijuego corre
+minigame_text = font.render("Minijuego en curso...", True, WHITE)
+minigame_rect = minigame_text.get_rect()
+minigame_rect.center = (width // 2, height // 2)
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
 def progress():
     return float(salame.health/100)
@@ -202,9 +203,10 @@ health_bar.show()
 backgrounds = [cocina, fondo_general, fondo_general]
 index = 0
 
-# flags
+
 show_info = False
 buymenu = False
+
 
 # para manejar la comida comprada
 food_index = 0
@@ -246,15 +248,14 @@ def ask_salame():
             salame_reply = subprocess.run(['python', 'mainai.py'], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
         except subprocess.TimeoutExpired:
             salame_reply = 'Tu salame quiere dormir!'
-            return
         except subprocess.CalledProcessError:
             salame_reply = 'El salame va a guardar sus secretos'
         else:
-            salame_reply = salame_reply.stdout
+            salame_reply = salame_reply.stdout.decode('utf-8')
             salame_wait = False
-            return
         finally:
             textbox.setText("")
+            return
 
    
 textbox = TextBox(
@@ -275,55 +276,40 @@ textbox.hide()
 
 #--------------------------------------------------botones de juegos-----------------------------
 class GameButton:
-    def __init__(self, name, script_path, rect, image=None):
+    def __init__(self, name, script_path, rect_value_1, rect_value_2, image=None):
         self.name = name
-        self.rect = rect
+        self.rect = pygame.Rect(rect_value_1, rect_value_2, 235, 75)
         self.script_path = os.path.abspath(script_path)
+        self.image = image
         self.button = self.button = Button(
                 screen,
                 int(self.rect.x),
                 int(self.rect.y),
                 int(self.rect.width),
                 int(self.rect.height),
-                text=str(self.name),  
+                text=str(self.name),
+                font=font,  
                 fontSize=30,
-                onClick=self.run
+                onClick=self.run,
+                image=self.image
             )
     def run(self):
-        command = [sys.executable, self.script_path]
-        if sys.platform == "win32":
-            DETACHED_PROCESS = 0x00000008
-            CREATE_NEW_PROCESS_GROUP = 0x00000200
-            subprocess.Popen(
-                command,
-                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                close_fds=True,
-            )
-            running = False
-
-        else:
-            subprocess.Popen(
-                command,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                start_new_session=True,  
-                close_fds=True,
-            )
-            running = False
+        global minigame_text, minigame_rect
+        process = subprocess.Popen(["python", self.script_path])
+        screen.fill(DARK)
+        screen.blit(minigame_text, minigame_rect)
+        pygame.display.update()
+        process.wait()
 
     def hide(self):
         self.button.hide()
     def show(self):
         self.button.show()
 
-lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(90, 140, 120, 90))
-blackjack = GameButton("Blackjack", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(90, 350, 120, 90))
-pong =  GameButton("Poung", r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(590, 140, 120, 90))
-buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", pygame.Rect(590, 350, 120, 90))
+lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
+blackjack = GameButton("Blackjack", r"Mini_Juego_LLC\LluviaComida.py", 10, 350)
+pong =  GameButton("Poung", r"Mini_Juego_LLC\LluviaComida.py", 555, 140)
+buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 350)
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
@@ -341,6 +327,8 @@ def flag_button(text):
     text_rect = font.render(text, True, BLACK)
     text_rect = text_rect.get_rect()
     text_rect.center = (width // 2, height // 2)
+    if salame_reply:
+        text_rect = pygame.Rect(0, 0, 780, 500)
     button_flag = Button(
                 screen,
                 text_rect.x,
@@ -395,6 +383,7 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
             elif event.key == pygame.K_i:
+                i_text = ''
                 show_info = not show_info
             elif event.key == pygame.K_b:
                 if index == 0:
@@ -411,14 +400,23 @@ while running:
                     food_index = (food_index + 1) % len(bought_food)
 
     current_background = backgrounds[index]
-
     if button_flag_state and button_flag is not None:
         pygame_widgets.update(events)
         pygame.display.update()
         continue
     elif show_info:
         screen.fill(WHITE)
-        screen.blit(i_text, i_rect)
+        if not i_text:
+            with open(get_path("info.txt"), "r", encoding="utf-8") as f:
+                i_text = f.read()
+                i_text = i_text.splitlines()
+        y_offset = 10
+        for line in i_text:
+            rendered_line = font.render(line, True, BLACK)
+            line_rect = rendered_line.get_rect()
+            line_rect.topleft = (10, y_offset)
+            screen.blit(rendered_line, line_rect)
+            y_offset += line_rect.height + 5
         pygame.display.update() 
         continue
     else:
