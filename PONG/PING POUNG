@@ -16,8 +16,7 @@ def load_font(path_or_name, size):
         print(f"Error cargando fuente '{path_or_name}': {e}. Usando fuente por defecto.")
         return pygame.font.Font(None, size)
 
-
-font_menu = load_font('monogram-extended.ttf', 30) 
+font_menu = load_font('monogram-extended.ttf', 30)
 font20 = load_font('freesansbold.ttf', 20)
 
 BLACK = (0, 0, 0)
@@ -31,22 +30,23 @@ pygame.display.set_caption("Ping Poung")
 clock = pygame.time.Clock()
 FPS = 30
 
-salame_image = None
-try:
-    possible_paths = [
-        'salame.png',
-        os.path.join(os.path.dirname(__file__), 'salame.png')
+def load_image(name):
+    paths = [
+        name,
+        os.path.join(os.path.dirname(__file__), name)
     ]
-    for p in possible_paths:
+    for p in paths:
         if os.path.exists(p):
-            salame_image = pygame.image.load(p).convert_alpha()
-            break
-    if salame_image is None:
-        print("Aviso: no se encontró 'salame.png' en las rutas esperadas.")
-except Exception as e:
-    print("Aviso: no se pudo cargar 'salame.png'. Asegúrate de que el archivo existe en la carpeta del script.")
-    print("Error:", e)
-    salame_image = None
+            try:
+                return pygame.image.load(p).convert_alpha()
+            except Exception as e:
+                print(f"Error cargando imagen '{p}': {e}")
+                return None
+    print(f"Advertencia: imagen '{name}' no encontrada en rutas esperadas.")
+    return None
+
+salame_image = load_image('salame_espacial.png')               
+salame_marsiano_image = load_image('salame_marsiano.png')  
 
 def show_start_screen():
     running = True
@@ -87,7 +87,7 @@ class Striker:
         self.height = height
         self.speed = speed
         self.color = color
-        self.image = image 
+        self.image = image
         if self.image:
             try:
                 self.image = pygame.transform.scale(self.image, (self.width, self.height))
@@ -99,16 +99,14 @@ class Striker:
         if self.image:
             screen.blit(self.image, (self.posx, self.posy))
         else:
-            self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
+            pygame.draw.rect(screen, self.color, self.geekRect)
 
     def update(self, yFac):
         self.posy = self.posy + self.speed * yFac
-
         if self.posy <= 0:
             self.posy = 0
         elif self.posy + self.height >= HEIGHT:
             self.posy = HEIGHT - self.height
-
         self.geekRect = pygame.Rect(self.posx, self.posy, self.width, self.height)
 
     def displayScore(self, text, score, x, y, color):
@@ -121,17 +119,26 @@ class Striker:
         return self.geekRect
 
 class Bot:
-    def __init__(self, posx, posy, width, height, speed, color):
+    def __init__(self, posx, posy, width, height, speed, color, image=None):
         self.posx = posx
         self.posy = posy
         self.width = width
         self.height = height
         self.speed = speed
         self.color = color
+        self.image = image
+        if self.image:
+            try:
+                self.image = pygame.transform.scale(self.image, (self.width, self.height))
+            except Exception:
+                pass
         self.geekRect = pygame.Rect(posx, posy, width, height)
 
     def display(self):
-        self.geek = pygame.draw.rect(screen, self.color, self.geekRect)
+        if self.image:
+            screen.blit(self.image, (self.posx, self.posy))
+        else:
+            pygame.draw.rect(screen, self.color, self.geekRect)
 
     def update(self, ball):
         target_pos = ball.posy - self.height / 2
@@ -207,15 +214,23 @@ def main():
         if mode is None:
             break
 
-        left_width, left_height = 50, 80  
+        left_img_w, left_img_h = 100, 80
+        right_img_w, right_img_h = 100, 80
+
         if salame_image:
-            geek1 = Striker(20, 0, left_width, left_height, 10, GREEN, image=salame_image)
+            geek1 = Striker(20, 0, left_img_w, left_img_h, 10, GREEN, image=salame_image)
         else:
             geek1 = Striker(20, 0, 10, 100, 10, GREEN)
         if mode == "PVP":
-            geek2 = Striker(WIDTH - 30, 0, 10, 100, 10, GREEN)
+            if salame_marsiano_image:
+                geek2 = Striker(WIDTH - 20 - right_img_w, 0, right_img_w, right_img_h, 10, GREEN, image=salame_marsiano_image)
+            else:
+                geek2 = Striker(WIDTH - 30, 0, 10, 100, 10, GREEN)
         else:
-            geek2 = Bot(WIDTH - 30, 0, 10, 100, 5, GREEN)
+            if salame_marsiano_image:
+                geek2 = Bot(WIDTH - 20 - right_img_w, 0, right_img_w, right_img_h, 5, GREEN, image=salame_marsiano_image)
+            else:
+                geek2 = Bot(WIDTH - 30, 0, 10, 100, 5, GREEN)
 
         ball = Ball(WIDTH // 2, HEIGHT // 2, 7, 7, WHITE)
         listOfGeeks = [geek1, geek2]
@@ -266,6 +281,7 @@ def main():
             for geek in listOfGeeks:
                 if ball.getRect().colliderect(geek.getRect()):
                     ball.hit()
+
             geek1.update(geek1YFac)
             point = ball.update()
 

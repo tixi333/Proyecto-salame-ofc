@@ -121,20 +121,31 @@ last_update = pygame.time.get_ticks()
 def play():
     screen.fill(resources["colors"][3])
     cartuchos = []
-    c = 0
-    try:
-        cant_fogueo = random.randint(1,8)
-        n = 8 - cant_fogueo
-        if n == 0:
-            raise Exception
+    while True:
+        try:
+            cant_fogueo = random.randint(1,8)
+            n = 8 - cant_fogueo
+            if n == 0:
+                raise Exception
+                
+        except Exception as e:
+            print("Tienes que tener al menos 1 cartucho")
+        else:
+            cant_vivos = random.randint(1,n)
+            print(cant_fogueo)
+            print(cant_vivos)
+
+            for i in range(cant_fogueo):
+                cartuchos.append(1)
+
+            for i in range(cant_vivos):
+                cartuchos.append(0)
+            print(cartuchos)
+            cartuchos.sort()
+            print(cartuchos)
+
+            break
             
-    except Exception as e:
-        print("Tienes que tener al menos 1 cartucho")
-    else:
-        cant_vivos = random.randint(1,n)
-        print(cant_fogueo)
-        print (cant_vivos)
-        c = 1
             
 
 def draw(last_update,frame_index):
@@ -164,10 +175,10 @@ def draw(last_update,frame_index):
 
     elif actual_screen == "play_screen":   #screen
         screen.fill(resources["colors"][3])
-        c = 0
-        while c == 0:
+        global play_started
+        if not play_started:
             play()
-            c+=1
+            play_started = True
     
     elif actual_screen == "options_screen":   #screen
         screen.fill(resources["colors"][3])
@@ -194,6 +205,7 @@ def draw(last_update,frame_index):
     pygame.display.flip()
     return last_update, frame_index
 
+play_started = False
 running = True
 
 while running:
