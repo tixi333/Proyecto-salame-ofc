@@ -1,5 +1,5 @@
 
-import pygame, pygame_widgets, os, time, subprocess, sys
+import pygame, pygame_widgets, os, time, subprocess
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
 from pygame_widgets.progressbar import ProgressBar
@@ -23,11 +23,10 @@ ACCENT = (90, 200, 255)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
-client = ""
 #--------------------------------seteo daño salud--------------------------------------------------------------
 with open("lasttime.txt", "r") as f:
     last_time = f.read().strip()
-current_time = time.monotonic()
+current_time = time.time()
 if last_time:
     last_time = float(last_time) 
 else:
@@ -38,7 +37,7 @@ with open("health.txt", "r") as f:
     if os.path.getsize("health.txt") > 0:
         current_health = int(f.read().strip())
     else:
-        current_health = 100
+        current_health = 0
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
@@ -48,7 +47,7 @@ with open("money.txt", "r") as m:
     if money_value_str:
         money_value = int(money_value_str) 
     else:
-        money_value = 0
+        money_value = 0 
 #-------------------acceder a una imagen --------------------------------------------------------------------
 def get_path(filename):
     path = f"salame/files_main/{filename}"
@@ -83,7 +82,7 @@ class Food:
         self.image_name = image_name
         self.health = health
         self.value = value
-        self.image = pygame.image.load(image_name).convert_alpha()
+        self.image = pygame.image.load(get_path(image_name)).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
         self.rect = rect
 
@@ -138,6 +137,14 @@ class Food:
     def hide(self):
         self.button.hide()
 
+#----------------------------seteo comida comprada---------------------------------
+bought_food = []
+with open("food_bought.txt", "r") as f:
+    if os.path.getsize("food_bought.txt") > 1:
+        for i in f:
+            name, image_name, health, value = i.strip().split(" | ")
+            bought_food.append(Food(name, image_name, int(health), int(value)))
+
 #------------------------------------------------------------renders sin función--------------------------------------------------------
 
 # flechas generales de todos los back (salvo los flags)
@@ -186,6 +193,7 @@ minigame_rect.center = (width // 2, height // 2)
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
 def progress():
     return float(salame.health/100)
+
 health_bar = ProgressBar(
     screen,
     200,                
@@ -203,14 +211,11 @@ health_bar.show()
 backgrounds = [cocina, fondo_general, fondo_general]
 index = 0
 
-
 show_info = False
 buymenu = False
 
-
 # para manejar la comida comprada
 food_index = 0
-bought_food = []
 
 total_lines = 49
 total_pages = 7
@@ -229,7 +234,7 @@ def read_page(page):
             if i >= start_line + ITEMS_PER_PAGE:
                 break
             name, image_name, health, value = line.strip().split(" | ")
-            foods_on_page.append(Food(name, get_path(image_name), int(health), int(value)))
+            foods_on_page.append(Food(name, image_name, int(health), int(value)))
     return foods_on_page
 #------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
@@ -276,11 +281,11 @@ textbox.hide()
 
 #--------------------------------------------------botones de juegos-----------------------------
 class GameButton:
-    def __init__(self, name, script_path, rect_value_1, rect_value_2, image=None):
+    def __init__(self, name, script_path, rect_value_1, rect_value_2, image="gamebutton.png"):
         self.name = name
         self.rect = pygame.Rect(rect_value_1, rect_value_2, 235, 75)
         self.script_path = os.path.abspath(script_path)
-        self.image = image
+        self.image = pygame.image.load(get_path(image)).convert_alpha()
         self.button = self.button = Button(
                 screen,
                 int(self.rect.x),
@@ -307,9 +312,9 @@ class GameButton:
         self.button.show()
 
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
-blackjack = GameButton("Blackjack", r"Mini_Juego_LLC\LluviaComida.py", 10, 350)
-pong =  GameButton("Poung", r"Mini_Juego_LLC\LluviaComida.py", 555, 140)
-buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 350)
+blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
+pong =  GameButton("Poung", r"PONG\PING POUNG", 555, 140)
+buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 400)
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
@@ -368,7 +373,7 @@ while running:
     for event in events:
         if event.type == pygame.QUIT:
             with open("lasttime.txt", "w") as f:
-                f.write(str(time.monotonic()))
+                f.write(str(time.time()))
             with open("health.txt", "w") as f:
                 f.write(str(salame.health))
             with open("food_bought.txt", "w") as f:
@@ -416,7 +421,7 @@ while running:
             line_rect = rendered_line.get_rect()
             line_rect.topleft = (10, y_offset)
             screen.blit(rendered_line, line_rect)
-            y_offset += line_rect.height + 5
+            height_offset += line_rect.height + 5
         pygame.display.update() 
         continue
     else:
@@ -454,11 +459,6 @@ while running:
                     screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
                     general_buttons.append([bought_food[food_index]])
                     bought_food[food_index].draw()
-                elif os.path.getsize("food_bought.txt") > 1:
-                            with open("food_bought.txt", "r") as f:
-                                for i in f:
-                                    name, image_name, health, value = i.strip().split(" | ")
-                                    bought_food.append(Food(name, image_name, int(health), int(value)))
                 else:
                     screen.blit(no_food_text, no_food_rect)
 
