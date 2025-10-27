@@ -20,6 +20,7 @@ YELLOW = (245, 210, 80)
 PURPLE = (160, 120, 220)
 DARK = (24, 26, 32)
 ACCENT = (90, 200, 255)
+BEIGE = (255, 249, 180)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
@@ -181,11 +182,13 @@ money_image = pygame.image.load("coin.png").convert_alpha()
 money_image = pygame.transform.scale(money_image, (40, 40))
 money_image_rect = money_image.get_rect()
 money_image_rect.topleft = (10, 10)
+
 #fondos
 cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
 fondo_general = pygame.image.load(get_path('fondo.png')).convert()
 fondo_general = pygame.transform.scale(fondo_general, (width, height))
+
 #cuando un minijuego corre
 minigame_text = font.render("Minijuego en curso...", True, WHITE)
 minigame_rect = minigame_text.get_rect()
@@ -239,10 +242,9 @@ def read_page(page):
 #------------------------------------------------------------interacción con salame------------------------------------------------------
 #para hablarle al salame
 salame_reply = ""
+salame_wait = False
 def ask_salame():
-    global salame_reply
-    if 'salame_wait' not in locals():
-        salame_wait = False
+    global salame_reply, salame_wait
     if salame_wait == True:
         pass
     else:
@@ -293,8 +295,8 @@ class GameButton:
                 int(self.rect.width),
                 int(self.rect.height),
                 text=str(self.name),
-                font=font,  
-                fontSize=30,
+                font=font,
+                fontSize=50,
                 onClick=self.run,
                 image=self.image
             )
@@ -313,7 +315,7 @@ class GameButton:
 
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
 blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
-pong =  GameButton("Poung", r"PONG\PING POUNG", 555, 140)
+pong =  GameButton("Poung", r"PONG\PINGPOUNG.py", 555, 140)
 buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 400)
         
 
@@ -415,11 +417,11 @@ while running:
             with open(get_path("info.txt"), "r", encoding="utf-8") as f:
                 i_text = f.read()
                 i_text = i_text.splitlines()
-        y_offset = 10
+        height_offset = 10
         for line in i_text:
             rendered_line = font.render(line, True, BLACK)
             line_rect = rendered_line.get_rect()
-            line_rect.topleft = (10, y_offset)
+            line_rect.topleft = (10, height_offset)
             screen.blit(rendered_line, line_rect)
             height_offset += line_rect.height + 5
         pygame.display.update() 
@@ -479,7 +481,6 @@ while running:
             blackjack.hide()
             lluvia_comida.hide()
             pong.hide()
-
 
         pygame_widgets.update(events)
         pygame.display.update()
