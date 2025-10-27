@@ -68,12 +68,12 @@ def load_resources():
     text_hard = font.render("Hard", True, red)
 
     #------------------ items
-   # lupa = pygame.image.load("Buckshot Roulette/items/lupa.png").convert()
-    #adrenalina = pygame.image.load("Buckshot Roulette/items/adrenalina.png").convert()
-    #burner_phone = pygame.image.load("Buckshot Roulette/items/burner_phone.png").convert()
-    #cig = pygame.image.load("Buckshot Roulette/items/cig.png").convert()
-   # cosa = pygame.image.load("Buckshot Roulette/items/eso.png").convert()
-   # handsaw = pygame.image.load("Buckshot Roulette/items/handsaw.png").convert()
+    lupa = pygame.image.load("Buckshot Roulette/items/lupa.png").convert()
+    adrenalina = pygame.image.load("Buckshot Roulette/items/adrenalina.png").convert()
+    burner_phone = pygame.image.load("Buckshot Roulette/items/burner_phone.png").convert()
+    cig = pygame.image.load("Buckshot Roulette/items/cig.png").convert()
+    cosa = pygame.image.load("Buckshot Roulette/items/eso.png").convert()
+    handsaw = pygame.image.load("Buckshot Roulette/items/handsaw.png").convert()
 
     background = []
 
@@ -84,6 +84,7 @@ def load_resources():
         background.append(scale)
         
     return    {
+        "font": font,
         "background" : background,
         "menu": {"text_play": [text_play, text_play2],
                  "text_options" : [text_options, text_options2],
@@ -101,7 +102,7 @@ def load_resources():
                      "desc_normal" : [text_normal_d, text_normal_d2],
                      "desc_hard" : [text_hard_d, text_hard_d2]
                      },
-        #"items" : {lupa, adrenalina, cig, cosa, handsaw, burner_phone},
+        "items" : {"lupa": lupa, "adrenalina": adrenalina, "cig": cig, "cosa": cosa, "handsaw": handsaw, "burner_phone": burner_phone},
         "options_text" : options,
         "volumen" : text_volumen,
         "difficulty": text_options_difficulty,
