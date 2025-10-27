@@ -2,7 +2,7 @@ import pygame
 import random
 from setup import init_pygame
 from resources import load_resources
-
+from play import play
 
 init_pygame()
 resources = load_resources()
@@ -118,35 +118,7 @@ buttons_options = [
 frame_index = 0
 frame_delay = 100
 last_update = pygame.time.get_ticks()
-def play():
-    screen.fill(resources["colors"][3])
-    cartuchos = []
-    while True:
-        try:
-            cant_fogueo = random.randint(1,8)
-            n = 8 - cant_fogueo
-            if n == 0:
-                raise Exception
-                
-        except Exception as e:
-            print("Tienes que tener al menos 1 cartucho")
-        else:
-            cant_vivos = random.randint(1,n)
-            print(cant_fogueo)
-            print(cant_vivos)
 
-            for i in range(cant_fogueo):
-                cartuchos.append(1)
-
-            for i in range(cant_vivos):
-                cartuchos.append(0)
-            print(cartuchos)
-            cartuchos.sort()
-            print(cartuchos)
-
-            break
-            
-            
 
 def draw(last_update,frame_index):
     if actual_screen == "main_screen":
