@@ -56,11 +56,11 @@ def show_start_screen():
         title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
         screen.blit(title_text, title_rect)
 
-        pvp_text = font_menu.render("Press 1 for Player vs Player", True, WHITE)
+        pvp_text = font_menu.render("Press [1] for Player vs Player", True, WHITE)
         pvp_rect = pvp_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(pvp_text, pvp_rect)
 
-        pve_text = font_menu.render("Press 2 for Player vs Bot", True, WHITE)
+        pve_text = font_menu.render("Press [2] for Player vs Bot", True, WHITE)
         pve_rect = pve_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 40))
         screen.blit(pve_text, pve_rect)
 
@@ -218,19 +218,19 @@ def main():
         right_img_w, right_img_h = 100, 80
 
         if salame_image:
-            geek1 = Striker(20, 0, left_img_w, left_img_h, 10, GREEN, image=salame_image)
+            geek1 = Striker(0, 0, left_img_w, left_img_h, 10, GREEN, image=salame_image)
         else:
-            geek1 = Striker(20, 0, 10, 100, 10, GREEN)
+            geek1 = Striker(0, 0, 10, 100, 10, GREEN)
         if mode == "PVP":
             if salame_marsiano_image:
-                geek2 = Striker(WIDTH - 20 - right_img_w, 0, right_img_w, right_img_h, 10, GREEN, image=salame_marsiano_image)
+                geek2 = Striker(WIDTH - right_img_w, 0, right_img_w, right_img_h, 10, GREEN, image=salame_marsiano_image)
             else:
-                geek2 = Striker(WIDTH - 30, 0, 10, 100, 10, GREEN)
+                geek2 = Striker(WIDTH - 10, 0, 10, 100, 10, GREEN)
         else:
             if salame_marsiano_image:
-                geek2 = Bot(WIDTH - 20 - right_img_w, 0, right_img_w, right_img_h, 5, GREEN, image=salame_marsiano_image)
+                geek2 = Bot(WIDTH - right_img_w, 0, right_img_w, right_img_h, 5, GREEN, image=salame_marsiano_image)
             else:
-                geek2 = Bot(WIDTH - 30, 0, 10, 100, 5, GREEN)
+                geek2 = Bot(WIDTH - 10, 0, 10, 100, 5, GREEN)
 
         ball = Ball(WIDTH // 2, HEIGHT // 2, 7, 7, WHITE)
         listOfGeeks = [geek1, geek2]
@@ -297,8 +297,8 @@ def main():
             geek2.display()
             ball.display()
 
-            geek1.displayScore("Geek_1 : ", geek1Score, 100, 20, WHITE)
-            geek2.displayScore("Geek_2 : ", geek2Score, WIDTH - 100, 20, WHITE)
+            geek1.displayScore("SALAME: ", geek1Score, 100, 20, WHITE)
+            geek2.displayScore("MARSIANO : ", geek2Score, WIDTH - 100, 20, WHITE)
 
             pygame.display.update()
             clock.tick(FPS)
