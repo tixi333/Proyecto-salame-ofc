@@ -107,12 +107,10 @@ while True:
     else:
         cambiar_animacion("idle")
         pantalla.blit(text_3, (170, 120))
-
-        id 
+ 
     pantalla.blit(frames[int(indice_frame)], (300, 150))
     pantalla.blit(inventory_dealer, (0, 0))
     pantalla.blit(text_current_life_dealer, (20, 120))
-
     
     if inventory_on:
         pantalla.blit(inventory_player, (0, 480))
@@ -123,12 +121,10 @@ while True:
             pantalla.blit(text_2, (170, 450))
         else:
             pantalla.blit(text_3, (170, 450))
-
     
     indice_frame += velocidad_anim
     if indice_frame >= len(frames):
         indice_frame = 0  
-
     
     pygame.display.flip()
     reloj.tick(60)
