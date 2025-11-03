@@ -1,21 +1,30 @@
 import pygame
 import random
+import sys
 from resources import load_resources
+from setup import init_pygame
 
+init_pygame()
 resources = load_resources()
+
+screen = pygame.display.set_mode((resources["width"],resources["height"]))
+pygame.display.set_caption("Buckshot Roullete") 
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (220, 60, 60)
 BLUE = (60, 120, 220)
-WIDTH, HEIGHT = 800, 
+WIDTH, HEIGHT = 800, 600 
 font = resources["font"]
+ 
+
 class Dealer:
     def __init__(self):
         self.hp = 3
         self.state = "idle"
         self.timer = 0
         self.known_next_shell = None
-        self.inventory = ["magnifying_glass", "cigarette", "saw", "handcuffs"]
+        self.inventory = ["magnifying_glass","adrenaline", "cigarette", "saw", "handcuffs"]
 
         self.current_message = ""
         self.messages = [
@@ -91,7 +100,7 @@ class Dealer:
 
         return random.choices(["player", "self"], weights=[0.7, 0.3])[0]
 
- def use_item(self, chamber, index):
+    def use_item(self, chamber, index):
         if not self.inventory:
             return None
 
