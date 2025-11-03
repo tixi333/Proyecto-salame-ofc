@@ -5,23 +5,22 @@ import sys
 import os
 import random
 
-# Inicializar Pygame
+
 pygame.init()
 pygame.font.init()
 
-# Configurar la ventana
+
 ANCHO = 800
 ALTO = 600
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Buckshot Roulette - Demo")
 font = pygame.font.Font("monogram-extended.ttf", 30)
 
-# Colores
 black = (0, 0, 0)
 grey = (128, 128, 128)
 red = (139, 0, 0)
 
-# Imagen de fondo (mesa)
+
 mesa = pygame.image.load("Buckshot Roulette\\prueba\\mesa_bs.png")
 mesa_scale = pygame.transform.scale(mesa, (800, 600))
 
@@ -31,10 +30,10 @@ inventory_dealer = pygame.transform.scale(inventory_dealer, (228, 123))
 inventory_player = pygame.image.load("Buckshot Roulette\\prueba\\inventory.png")
 inventory_player = pygame.transform.scale(inventory_player, (228, 123))
 
-# Animación actual
+
 actual_animation = "idle"
 
-# Función para cargar frames automáticamente
+
 def cargar_frames(ruta_frames):
     frames = []
     for archivo in sorted(os.listdir(ruta_frames)):
@@ -44,7 +43,7 @@ def cargar_frames(ruta_frames):
             frames.append(imagen)
     return frames
 
-# Función para cambiar de animación solo si cambia el estado
+
 def cambiar_animacion(nueva_animacion):
     global actual_animation, frames, indice_frame, ruta_frames
     if actual_animation != nueva_animacion:
@@ -53,11 +52,11 @@ def cambiar_animacion(nueva_animacion):
         frames = cargar_frames(ruta_frames)
         indice_frame = 0
 
-# Cargar frames iniciales
+
 ruta_frames = "Buckshot Roulette\\prueba\\idle"
 frames = cargar_frames(ruta_frames)
 
-# Variables de control
+
 indice_frame = 0
 velocidad_anim = 0.12
 reloj = pygame.time.Clock()
@@ -75,7 +74,6 @@ text_dealer_dead = font.render("Dealer is dead", True, red)
 
 inventory_on = False
 
-# Bucle principal del juego
 while True:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:

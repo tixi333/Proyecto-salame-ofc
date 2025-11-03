@@ -1,5 +1,6 @@
 import os
 import pygame
+import random
 
 pygame.init()
 
@@ -214,8 +215,8 @@ def main():
         if mode is None:
             break
 
-        left_img_w, left_img_h = 100, 80
-        right_img_w, right_img_h = 100, 80
+        left_img_w, left_img_h = 80, 80
+        right_img_w, right_img_h = 80, 80
 
         if salame_image:
             geek1 = Striker(0, 0, left_img_w, left_img_h, 10, GREEN, image=salame_image)

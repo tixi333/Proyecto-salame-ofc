@@ -148,22 +148,29 @@ def mostrar_controles():
         "[R] Salir"
         ]
     for i, linea in enumerate(instrucciones):
-        y_pos = 50 + i * 75  
-        #ventana.blit(cartel_base, (699, y_pos-48)) 
+        y_pos = 50 + i * 75   
         txt = FUENTE.render(linea, True, BLANCO)
         ventana.blit(txt, (700, y_pos - 10))
 
+def mostrar_dinero(dinero):
+    fuente_dinero = pygame.font.Font("monogram-extended.ttf", 40) 
+    dinero_txt = fuente_dinero.render(f"${dinero}", True, BLANCO)
+    ventana.blit(dinero_txt, (20, 20)) 
 def main():
     clock = pygame.time.Clock()
     dinero = leer_dinero()
     print(f"Tienes {dinero} en tu cuenta.")
     
-    if dinero < 100:
+    if dinero < 1000: 
         mostrar_mensaje("No tienes suficiente dinero para jugar.")
         pygame.display.flip()
         pygame.time.wait(2000)
         pygame.quit()
         sys.exit()
+
+    dinero -= 1000
+    escribir_dinero(dinero)
+
     baraja = crear_baraja()
     jugador = [baraja.pop(), baraja.pop()]
     dealer = [baraja.pop(), baraja.pop()]
@@ -173,7 +180,8 @@ def main():
 
     while True:
         ventana.blit(cargar_fondo(), (0,0))
-
+        mostrar_dinero(dinero)
+        
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
@@ -195,6 +203,8 @@ def main():
                         puntos_d = calcular_puntos(dealer)
                         if puntos_d > 21 or puntos_j > puntos_d:
                             resultado = "¡Ganaste!"
+                            dinero += 2000
+                            escribir_dinero(dinero)
                         elif puntos_j == puntos_d:
                             resultado = "Empate."
                         else:
