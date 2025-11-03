@@ -1,15 +1,19 @@
 Usá las flechas para mover entre menús.
 En el menú de comida: 
--Usá "d" para moverte un item a la derecha 
+☻ Usá "d" para moverte un item a la derecha 
 y "a" para la izquierda
--Usá "b" para entrar al menú para comprar 
+☻ Usá "b" para entrar al menú para comprar 
 y cliqueá en la comida para comprarla
 Para hablar con el salame:
--Escribí lo que quieras en el buscador y esperá
--Vas a poder seguir jugando hasta que 
+☻ Escribí lo que quieras en el buscador y esperá
+☻ Vas a poder seguir jugando hasta que 
 el salame conteste,
 cuando lo haga va a aparecer una pantalla 
 con su respuesta que podés cliquear para eliminarla.
 Para los juegos:
--Nomás cliqueá los botones
+☻ Nomás cliqueá los botones
+Para los trajes:
+☻ Usá "d" para moverte un item a la derecha 
+y "a" para la izquierda
+
 

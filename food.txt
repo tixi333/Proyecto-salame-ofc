@@ -1,14 +1,14 @@
 Pastel de Manzana | 05_apple_pie.png | 35 | 2500
 Pan | 07_bread.png | 60 | 1200
 Baguette | 09_baguette.png | 55 | 1500
-Gofre | 101_waffle.png | 40 | 1800
+Waffle | 101_waffle.png | 40 | 1800
 Bollo | 11_bun.png | 55 | 900
 Tocino | 13_bacon.png | 30 | 2800
 Hamburguesa | 15_burger.png | 35 | 3000
 Burrito | 18_burrito.png | 45 | 2700
 Bagel | 20_bagel.png | 50 | 1400
 Tarta de Queso | 22_cheesecake.png | 30 | 3200
-Bocadito de Queso | 24_cheesepuff.png | 20 | 700
+Chizitos | 24_cheesepuff.png | 20 | 700
 Chocolate | 26_chocolate.png | 25 | 900
 Galletas | 28_cookies.png | 25 | 1200
 Pastel de Chocolate | 30_chocolatecake.png | 30 | 3300

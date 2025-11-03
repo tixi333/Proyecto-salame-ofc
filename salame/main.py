@@ -24,8 +24,13 @@ BEIGE = (255, 249, 180)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
+#-------------------acceder a un archivo --------------------------------------------------------------------
+def get_path(filename):
+    path = f"salame/files_main/{filename}"
+    path = os.path.abspath(path)
+    return path
 #--------------------------------seteo daño salud--------------------------------------------------------------
-with open("lasttime.txt", "r") as f:
+with open(get_path("lasttime.txt"), "r") as f:
     last_time = f.read().strip()
 current_time = time.time()
 if last_time:
@@ -34,11 +39,11 @@ else:
     last_time = current_time
 elapsed_time = current_time - last_time
 health_decrease = int(elapsed_time // 3600) * 5  
-with open("health.txt", "r") as f:
-    if os.path.getsize("health.txt") > 0:
+if os.path.getsize(get_path("health.txt")) > 0:
+    with open(get_path("health.txt"), "r") as f:
         current_health = int(f.read().strip())
-    else:
-        current_health = 0
+else:
+    current_health = 0
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
@@ -49,11 +54,7 @@ with open("money.txt", "r") as m:
         money_value = int(money_value_str) 
     else:
         money_value = 0 
-#-------------------acceder a una imagen --------------------------------------------------------------------
-def get_path(filename):
-    path = f"salame/files_main/{filename}"
-    path = os.path.abspath(path)
-    return path
+
 #-------------------funcion renderizar plata-------------------------
 def render_money():
     global money_value
@@ -63,10 +64,10 @@ def render_money():
     screen.blit(text_surface, rect)
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class Salame:
-    def __init__(self, current_health=current_health):
+    def __init__(self, image, current_health=current_health):
         self.health = current_health
         self.happiness = 100
-        self.image = pygame.image.load("salame.png").convert_alpha()
+        self.image = pygame.image.load(get_path(image)).convert_alpha()
         self.image = pygame.transform.scale(self.image, (400, 400))
         self.rect = self.image.get_rect()
         self.rect.center = (width // 2, height // 2)
@@ -75,7 +76,7 @@ class Salame:
         surface.blit(self.image, self.rect)
 
 # instancia salame
-salame = Salame()
+salame = Salame("salame_normal.png")
 
 class Food:
     def __init__(self, name, image_name, health, value, rect=pygame.Rect(358, 515, 85, 85)):
@@ -131,9 +132,6 @@ class Food:
             if salame.health > 100:
                 salame.health = 100
             bought_food.remove(self)
-            with open('food_bought.txt', 'w') as f:
-                for i in bought_food:
-                    f.write(f"{i.name} | {i.image_name} | {i.health} | {i.value}\n")
 
     def hide(self):
         self.button.hide()
@@ -211,11 +209,16 @@ health_bar.show()
 
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
-backgrounds = [cocina, fondo_general, fondo_general]
+backgrounds = (cocina, fondo_general, fondo_general, fondo_general)
+current_background = backgrounds[0]
 index = 0
 
 show_info = False
 buymenu = False
+# trajes
+current_skin = "salame_normal.png"
+skin_index = 0
+last_skin_index = 0
 
 # para manejar la comida comprada
 food_index = 0
@@ -259,18 +262,17 @@ def ask_salame():
             salame_reply = 'El salame va a guardar sus secretos'
         else:
             salame_reply = salame_reply.stdout.decode('utf-8')
-            salame_wait = False
         finally:
             textbox.setText("")
+            salame_wait = False
             return
 
-   
 textbox = TextBox(
     screen,
-    50,                
-    height - 80,       
-    700,               
-    60,                
+    50,
+    height - 80,
+    700,
+    60,
     fontSize=28,
     font=font,
     borderColour=BLUE,
@@ -347,7 +349,7 @@ def flag_button(text):
                 fontSize=30,
                 margin=10,
                 inactiveColour=PURPLE,
-                hoverColour=ACCENT,
+                hoverColour=RED,
                 pressedColour=RED,
                 onClick=kill_button_flag
                 )
@@ -400,11 +402,15 @@ while running:
                     current_page = (current_page - 1) % total_pages
                 elif index == 0 and bought_food:
                     food_index = (food_index - 1) % len(bought_food)
+                elif current_background == fondo_general and index == 3:
+                    skin_index = (skin_index - 1) % 7
             elif event.key == pygame.K_d:
                 if buymenu:
                     current_page = (current_page + 1) % total_pages
                 elif index == 0 and bought_food:
                     food_index = (food_index + 1) % len(bought_food)
+                elif current_background == fondo_general and index == 3:
+                    skin_index = (skin_index + 1) % 7
 
     current_background = backgrounds[index]
     if button_flag_state and button_flag is not None:
@@ -481,6 +487,14 @@ while running:
             blackjack.hide()
             lluvia_comida.hide()
             pong.hide()
-
+        if current_background == fondo_general and index == 3:
+            if last_skin_index != skin_index:
+                with open(get_path("skins.txt"), "r") as f:
+                    for index_skin, skin in enumerate(f):
+                        if index_skin == skin_index:
+                            current_skin = skin.strip()
+                salame.image = pygame.image.load(get_path(current_skin)).convert_alpha()
+                salame.image = pygame.transform.scale(salame.image, (400, 400))
+                last_skin_index = skin_index
         pygame_widgets.update(events)
         pygame.display.update()

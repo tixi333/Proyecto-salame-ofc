@@ -1,0 +1,7 @@
+salame_normal.png
+salame_mask.png
+salame_apple.png
+salame_frog.png
+salame_morsa.png
+salame_minion.png
+salame_homero.png
