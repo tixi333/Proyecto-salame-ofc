@@ -186,7 +186,10 @@ cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
 fondo_general = pygame.image.load(get_path('fondo.png')).convert()
 fondo_general = pygame.transform.scale(fondo_general, (width, height))
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 #cuando un minijuego corre
 minigame_text = font.render("Minijuego en curso...", True, WHITE)
 minigame_rect = minigame_text.get_rect()
@@ -213,12 +216,17 @@ backgrounds = (cocina, fondo_general, fondo_general, fondo_general)
 current_background = backgrounds[0]
 index = 0
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 show_info = False
 buymenu = False
 # trajes
 current_skin = "salame_normal.png"
 skin_index = 0
 last_skin_index = 0
+
 
 # para manejar la comida comprada
 food_index = 0
@@ -262,9 +270,15 @@ def ask_salame():
             salame_reply = 'El salame va a guardar sus secretos'
         else:
             salame_reply = salame_reply.stdout.decode('utf-8')
+<<<<<<< Updated upstream
         finally:
             textbox.setText("")
             salame_wait = False
+=======
+            salame_wait = False
+        finally:
+            textbox.setText("")
+>>>>>>> Stashed changes
             return
 
 textbox = TextBox(
@@ -285,11 +299,19 @@ textbox.hide()
 
 #--------------------------------------------------botones de juegos-----------------------------
 class GameButton:
+<<<<<<< Updated upstream
     def __init__(self, name, script_path, rect_value_1, rect_value_2, image="gamebutton.png"):
         self.name = name
         self.rect = pygame.Rect(rect_value_1, rect_value_2, 235, 75)
         self.script_path = os.path.abspath(script_path)
         self.image = pygame.image.load(get_path(image)).convert_alpha()
+=======
+    def __init__(self, name, script_path, rect_value_1, rect_value_2, image=None):
+        self.name = name
+        self.rect = pygame.Rect(rect_value_1, rect_value_2, 235, 75)
+        self.script_path = os.path.abspath(script_path)
+        self.image = image
+>>>>>>> Stashed changes
         self.button = self.button = Button(
                 screen,
                 int(self.rect.x),
@@ -297,8 +319,13 @@ class GameButton:
                 int(self.rect.width),
                 int(self.rect.height),
                 text=str(self.name),
+<<<<<<< Updated upstream
                 font=font,
                 fontSize=50,
+=======
+                font=font,  
+                fontSize=30,
+>>>>>>> Stashed changes
                 onClick=self.run,
                 image=self.image
             )
@@ -316,9 +343,15 @@ class GameButton:
         self.button.show()
 
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
+<<<<<<< Updated upstream
 blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
 pong =  GameButton("Poung", r"PONG\PINGPOUNG.py", 555, 140)
 buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 400)
+=======
+blackjack = GameButton("Blackjack", r"Mini_Juego_LLC\LluviaComida.py", 10, 350)
+pong =  GameButton("Poung", r"Mini_Juego_LLC\LluviaComida.py", 555, 140)
+buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 350)
+>>>>>>> Stashed changes
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
