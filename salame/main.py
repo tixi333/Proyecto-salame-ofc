@@ -114,7 +114,7 @@ class Food:
         global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value
         if buymenu:
             if money_value >= self.value:
-                if len(bought_food) < 10:
+                if len(bought_food) < 5:
                     money_value -= self.value
                     new_rect = pygame.Rect(0, 0, 85, 85)
                     new_rect.midbottom = (width // 2, height)
@@ -255,13 +255,13 @@ def ask_salame():
         textbox_text = textbox.getText()
         textbox.setText("El salamín está pensando... no escribas nada")
         try:
-            salame_reply = subprocess.run(['python', 'mainai.py'], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
+            salame_reply = subprocess.run(['python', get_path("mainai.py")], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
         except subprocess.TimeoutExpired:
             salame_reply = 'Tu salame quiere dormir!'
         except subprocess.CalledProcessError:
             salame_reply = 'El salame va a guardar sus secretos'
         else:
-            salame_reply = salame_reply.stdout.decode('utf-8')
+            salame_reply = salame_reply.stdout
         finally:
             textbox.setText("")
             salame_wait = False
@@ -331,13 +331,18 @@ button_flag_type = ""
 button_flag = None
 
 def flag_button(text):
-    global button_flag_state, button_flag
+    global button_flag_state, button_flag, salame_reply
     button_flag_state = True
-    text_rect = font.render(text, True, BLACK)
-    text_rect = text_rect.get_rect()
-    text_rect.center = (width // 2, height // 2)
     if salame_reply:
-        text_rect = pygame.Rect(0, 0, 780, 500)
+        text_image = pygame.image.load(get_path("salame_reply_image.png")).convert_alpha()
+        text_rect = text_image.get_rect()
+        text_image = pygame.transform.scale(text_image, (text_rect.width, text_rect.height))
+    else:
+        text_rect = font.render(text, True, BLACK)
+        text_rect = text_rect.get_rect()
+        text_image = None
+
+    text_rect.center = (width // 2, height // 2)
     button_flag = Button(
                 screen,
                 text_rect.x,
@@ -349,23 +354,24 @@ def flag_button(text):
                 fontSize=30,
                 margin=10,
                 inactiveColour=PURPLE,
-                hoverColour=RED,
+                hoverColour=PURPLE,
                 pressedColour=RED,
                 onClick=kill_button_flag
                 )
     
 def kill_button_flag():
     global button_flag_state, button_flag, salame_reply
-    button_flag.hide()
-    button_flag = None
+    del button_flag
     button_flag_state = False
     if salame_reply:
         salame_reply = ''
+    pygame_widgets.update(pygame.event.get())  
+    pygame.display.update()
 
 def clear_buttons():
     for i in general_buttons:
         for widget in i:
-            widget.hide()
+            del widget
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
@@ -392,8 +398,9 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
             elif event.key == pygame.K_i:
-                i_text = ''
-                show_info = not show_info
+                if not current_background == fondo_general and index == 1:
+                    i_text = ''
+                    show_info = not show_info
             elif event.key == pygame.K_b:
                 if index == 0:
                     buymenu = not buymenu
