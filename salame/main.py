@@ -186,7 +186,6 @@ cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
 fondo_general = pygame.image.load(get_path('fondo.png')).convert()
 fondo_general = pygame.transform.scale(fondo_general, (width, height))
-
 #cuando un minijuego corre
 minigame_text = font.render("Minijuego en curso...", True, WHITE)
 minigame_rect = minigame_text.get_rect()
@@ -219,6 +218,7 @@ buymenu = False
 current_skin = "salame_normal.png"
 skin_index = 0
 last_skin_index = 0
+
 
 # para manejar la comida comprada
 food_index = 0
@@ -261,7 +261,7 @@ def ask_salame():
         except subprocess.CalledProcessError:
             salame_reply = 'El salame va a guardar sus secretos'
         else:
-            salame_reply = salame_reply.stdout
+            salame_reply = salame_reply.stdout.decode('utf-8')
         finally:
             textbox.setText("")
             salame_wait = False
@@ -297,8 +297,8 @@ class GameButton:
                 int(self.rect.width),
                 int(self.rect.height),
                 text=str(self.name),
-                font=font,
-                fontSize=50,
+                font=font,  
+                fontSize=30,
                 onClick=self.run,
                 image=self.image
             )
