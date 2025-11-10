@@ -44,6 +44,6 @@ Salmón | 88_salmon.png | 85 | 7500
 Pastel de Fresa | 90_strawberrycake.png | 35 | 3200
 Sándwich | 92_sandwich.png | 50 | 2000
 Espaguetis | 94_spaghetti.png | 45 | 2800
-Bistec | 95_steak.png | 80 | 8500
+Bife | 95_steak.png | 80 | 8500
 Sushi | 97_sushi.png | 75 | 5000
 Taco | 99_taco.png | 50 | 2200

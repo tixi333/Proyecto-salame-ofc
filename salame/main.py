@@ -1,5 +1,5 @@
 
-import pygame, pygame_widgets, os, time, subprocess
+import pygame, pygame_widgets, os, time, subprocess, sys, unicodedata
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
 from pygame_widgets.progressbar import ProgressBar
@@ -30,19 +30,20 @@ def get_path(filename):
     path = os.path.abspath(path)
     return path
 #--------------------------------seteo daño salud--------------------------------------------------------------
-with open(get_path("lasttime.txt"), "r") as f:
-    last_time = f.read().strip()
 current_time = time.time()
-if last_time:
-    last_time = float(last_time) 
-else:
+try:
+    with open(get_path("lasttime.txt"), "r") as f:
+        last_time = f.readline().strip()
+        last_time = float(last_time) 
+except Exception:
     last_time = current_time
 elapsed_time = current_time - last_time
-health_decrease = int(elapsed_time // 3600) * 5  
-if os.path.getsize(get_path("health.txt")) > 0:
+health_decrease = int(elapsed_time // 3600) * 5
+try:  
     with open(get_path("health.txt"), "r") as f:
-        current_health = int(f.read().strip())
-else:
+        current_health = f.readline().strip()
+        current_health = int(current_health)
+except Exception:
     current_health = 0
 current_health -= health_decrease
 if current_health < 0:
@@ -186,6 +187,7 @@ cocina = pygame.image.load(get_path('cocina.png')).convert()
 cocina = pygame.transform.scale(cocina, (width, height))
 fondo_general = pygame.image.load(get_path('fondo.png')).convert()
 fondo_general = pygame.transform.scale(fondo_general, (width, height))
+
 #cuando un minijuego corre
 minigame_text = font.render("Minijuego en curso...", True, WHITE)
 minigame_rect = minigame_text.get_rect()
@@ -219,7 +221,6 @@ current_skin = "salame_normal.png"
 skin_index = 0
 last_skin_index = 0
 
-
 # para manejar la comida comprada
 food_index = 0
 
@@ -246,22 +247,31 @@ def read_page(page):
 #para hablarle al salame
 salame_reply = ""
 salame_wait = False
+salame_reply_rendered = ""
+def normalize_unicode(text):
+    normalized_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
+    return normalized_text
 def ask_salame():
     global salame_reply, salame_wait
-    if salame_wait == True:
-        pass
+    textbox_text = textbox.getText()
+    textbox_text = normalize_unicode(textbox_text)
+    if salame_wait or not textbox_text.strip():
+        return
     else:
         salame_wait = True
-        textbox_text = textbox.getText()
         textbox.setText("El salamín está pensando... no escribas nada")
         try:
-            salame_reply = subprocess.run(['python', get_path("mainai.py")], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
+            salame_reply = subprocess.run([sys.executable, get_path('mainai.py')], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
         except subprocess.TimeoutExpired:
             salame_reply = 'Tu salame quiere dormir!'
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            print("❌ AI subprocess failed:")
+            print("Return code:", e.returncode)
+            print("STDERR:\n", e.stderr)
             salame_reply = 'El salame va a guardar sus secretos'
+    
         else:
-            salame_reply = salame_reply.stdout.decode('utf-8')
+            salame_reply = normalize_unicode(salame_reply.stdout)
         finally:
             textbox.setText("")
             salame_wait = False
@@ -297,8 +307,8 @@ class GameButton:
                 int(self.rect.width),
                 int(self.rect.height),
                 text=str(self.name),
-                font=font,  
-                fontSize=30,
+                font=font,
+                fontSize=50,
                 onClick=self.run,
                 image=self.image
             )
@@ -318,7 +328,7 @@ class GameButton:
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
 blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
 pong =  GameButton("Poung", r"PONG\PINGPOUNG.py", 555, 140)
-buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 400)
+buckshot = GameButton("Buckshot",r"Buckshot Roulette\buckshotroulette.py", 555, 400)
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
@@ -326,52 +336,55 @@ buckshot = GameButton("Buckshot",r"Mini_Juego_LLC\LluviaComida.py", 555, 400)
         
 #------------------------------------------------------------manejo de botones------------------------------------------------------
 general_buttons = []
-button_flag_state = False
-button_flag_type = ""
 button_flag = None
+button_flag_state = False
+button_flag_text = ""
+flag_cooldown = 0
 
 def flag_button(text):
-    global button_flag_state, button_flag, salame_reply
-    button_flag_state = True
-    if salame_reply:
-        text_image = pygame.image.load(get_path("salame_reply_image.png")).convert_alpha()
-        text_rect = text_image.get_rect()
-        text_image = pygame.transform.scale(text_image, (text_rect.width, text_rect.height))
-    else:
-        text_rect = font.render(text, True, BLACK)
-        text_rect = text_rect.get_rect()
-        text_image = None
+    global button_flag, button_flag_state, button_flag_text, flag_cooldown
+    if button_flag_state and button_flag_text == text:
+        return  
+    kill_button_flag()  
 
-    text_rect.center = (width // 2, height // 2)
+    text_surface = font.render(text, True, BLACK)
+    text_rect = text_surface.get_rect(center=(width // 2, height // 2))
+
     button_flag = Button(
-                screen,
-                text_rect.x,
-                text_rect.y,
-                text_rect.width + 20,
-                text_rect.height + 100,
-                text=text,
-                font=font,
-                fontSize=30,
-                margin=10,
-                inactiveColour=PURPLE,
-                hoverColour=PURPLE,
-                pressedColour=RED,
-                onClick=kill_button_flag
-                )
-    
+        screen,
+        text_rect.x - 10,
+        text_rect.y - 10,
+        text_rect.width + 20,
+        text_rect.height + 20,
+        text=text,
+        font=font,
+        fontSize=25,
+        margin=10,
+        inactiveColour=PURPLE,
+        hoverColour=RED,
+        pressedColour=RED,
+        onClick=kill_button_flag
+    )
+
+    button_flag_state = True
+    button_flag_text = text
+    flag_cooldown = time.time()  
+
+
 def kill_button_flag():
-    global button_flag_state, button_flag, salame_reply
-    del button_flag
+    global button_flag, button_flag_state, button_flag_text, salame_reply, salame_reply_rendered
+    if button_flag:
+        button_flag.hide()
+        button_flag = None
     button_flag_state = False
-    if salame_reply:
-        salame_reply = ''
-    pygame_widgets.update(pygame.event.get())  
-    pygame.display.update()
+    button_flag_text = ""
+    salame_reply = ""
+    salame_reply_rendered = False
 
 def clear_buttons():
     for i in general_buttons:
         for widget in i:
-            del widget
+            widget.hide()
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
@@ -398,7 +411,7 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
             elif event.key == pygame.K_i:
-                if not current_background == fondo_general and index == 1:
+                if not index == 1:
                     i_text = ''
                     show_info = not show_info
             elif event.key == pygame.K_b:
@@ -445,11 +458,12 @@ while running:
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
         health_bar.show()
-        screen.blit(info_text, info_rect)
         render_money()
         screen.blit(money_image, money_image_rect)
+        if not index == 1:
+            screen.blit(info_text, info_rect)
 
-        if current_background == cocina:  
+        if index == 0:  
             if buymenu:
                 screen.fill(WHITE)
                 health_bar.hide()
@@ -477,14 +491,15 @@ while running:
                 else:
                     screen.blit(no_food_text, no_food_rect)
 
-        if current_background == fondo_general and index == 1:
+        if index == 1:
             textbox.show()
-            if salame_reply:
+            if salame_reply and not salame_reply_rendered:
                 flag_button(salame_reply)
+                salame_reply_rendered = True
         else:
             textbox.hide()
         
-        if current_background == fondo_general and index == 2:
+        if index == 2:
             buckshot.show()
             blackjack.show()
             lluvia_comida.show()
@@ -494,7 +509,8 @@ while running:
             blackjack.hide()
             lluvia_comida.hide()
             pong.hide()
-        if current_background == fondo_general and index == 3:
+
+        if index == 3:
             if last_skin_index != skin_index:
                 with open(get_path("skins.txt"), "r") as f:
                     for index_skin, skin in enumerate(f):
