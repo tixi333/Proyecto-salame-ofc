@@ -2,7 +2,7 @@ import pygame
 import random
 from setup import init_pygame
 from resources import load_resources
-from play import play
+from game import run_game
 
 init_pygame()
 resources = load_resources()
@@ -147,10 +147,7 @@ def draw(last_update,frame_index):
 
     elif actual_screen == "play_screen":   #screen
         screen.fill(resources["colors"][3])
-        global play_started
-        if not play_started:
-            play()
-            play_started = True
+        run_game(screen)
     
     elif actual_screen == "options_screen":   #screen
         screen.fill(resources["colors"][3])
