@@ -39,12 +39,9 @@ except Exception:
     last_time = current_time
 elapsed_time = current_time - last_time
 health_decrease = int(elapsed_time // 3600) * 5
-try:  
-    with open(get_path("health.txt"), "r") as f:
-        current_health = f.readline().strip()
-        current_health = int(current_health)
-except Exception:
-    current_health = 0
+with open(get_path("health.txt"), "r") as f:
+    current_health = f.readline().strip()
+    current_health = int(current_health)
 current_health -= health_decrease
 if current_health < 0:
     current_health = 0
@@ -139,8 +136,8 @@ class Food:
 
 #----------------------------seteo comida comprada---------------------------------
 bought_food = []
-with open("food_bought.txt", "r") as f:
-    if os.path.getsize("food_bought.txt") > 1:
+if os.path.getsize(get_path("food_bought.txt")) > 1:
+    with open(get_path("food_bought.txt"), "r") as f:
         for i in f:
             name, image_name, health, value = i.strip().split(" | ")
             bought_food.append(Food(name, image_name, int(health), int(value)))
@@ -252,7 +249,7 @@ def normalize_unicode(text):
     normalized_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
     return normalized_text
 def ask_salame():
-    global salame_reply, salame_wait
+    global salame_reply, salame_wait, textbox
     textbox_text = textbox.getText()
     textbox_text = normalize_unicode(textbox_text)
     if salame_wait or not textbox_text.strip():
@@ -268,8 +265,7 @@ def ask_salame():
             print("❌ AI subprocess failed:")
             print("Return code:", e.returncode)
             print("STDERR:\n", e.stderr)
-            salame_reply = 'El salame va a guardar sus secretos'
-    
+            salame_reply = 'El salame va a guardar sus secretos' 
         else:
             salame_reply = normalize_unicode(salame_reply.stdout)
         finally:
@@ -314,7 +310,7 @@ class GameButton:
             )
     def run(self):
         global minigame_text, minigame_rect
-        process = subprocess.Popen(["python", self.script_path])
+        process = subprocess.Popen([sys.executable, self.script_path])
         screen.fill(DARK)
         screen.blit(minigame_text, minigame_rect)
         pygame.display.update()
@@ -395,11 +391,11 @@ while running:
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
-            with open("lasttime.txt", "w") as f:
+            with open(get_path("lasttime.txt"), "w") as f:
                 f.write(str(time.time()))
-            with open("health.txt", "w") as f:
+            with open(get_path("health.txt"), "w") as f:
                 f.write(str(salame.health))
-            with open("food_bought.txt", "w") as f:
+            with open(get_path("food_bought.txt"), "w") as f:
                 for i in bought_food:
                     f.write(f"{i.name} | {i.image_name} | {i.health} | {i.value}\n")
             with open('money.txt', 'w') as f:
