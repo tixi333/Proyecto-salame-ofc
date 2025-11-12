@@ -20,7 +20,7 @@ YELLOW = (245, 210, 80)
 PURPLE = (160, 120, 220)
 DARK = (24, 26, 32)
 ACCENT = (90, 200, 255)
-BEIGE = (255, 249, 180)
+CREAM = (255, 251, 209)
 pygame.display.set_caption("Cuida a tu salame")
 pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
 font = pygame.font.Font("monogram-extended.ttf", 36)
@@ -77,14 +77,18 @@ class Salame:
 salame = Salame("salame_normal.png")
 
 class Food:
-    def __init__(self, name, image_name, health, value, rect=pygame.Rect(358, 515, 85, 85)):
+    def __init__(self, name, image_name, health, value, rect=None):
         self.name = name
         self.image_name = image_name
         self.health = health
         self.value = value
         self.image = pygame.image.load(get_path(image_name)).convert_alpha()
         self.image = pygame.transform.scale(self.image, (85, 85))
-        self.rect = rect
+        if rect == None:
+            self.rect = pygame.Rect(0, 0, 85, 85)
+            self.rect.midbottom = (width // 2, height)
+        else:
+            self.rect = rect
 
     def draw(self):
         pos = (self.rect.x, self.rect.y, self.rect.width, self.rect.height)
@@ -109,14 +113,12 @@ class Food:
             self.button.show()
 
     def feed_or_buy(self):
-        global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value
+        global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value, food_index
         if buymenu:
             if money_value >= self.value:
                 if len(bought_food) < 5:
                     money_value -= self.value
-                    new_rect = pygame.Rect(0, 0, 85, 85)
-                    new_rect.midbottom = (width // 2, height)
-                    bought_item = Food(self.name, self.image_name, self.health, self.value, new_rect)
+                    bought_item = Food(self.name, self.image_name, self.health, self.value)
                     bought_food.append(bought_item)
                 else:
                     button_flag_state = True
@@ -130,6 +132,8 @@ class Food:
             if salame.health > 100:
                 salame.health = 100
             bought_food.remove(self)
+            if food_index >= len(bought_food):
+                food_index = max(0, len(bought_food) - 1)
 
     def hide(self):
         self.button.hide()
@@ -167,11 +171,6 @@ no_food_text = font.render("No tienes comida comprada", True, BLACK)
 no_food_rect = no_food_text.get_rect()
 no_food_rect.midbottom = (width // 2, height)
 
-# todo lo de info
-info_text = font.render("Presiona <i> para info", True, BLACK)
-info_rect = info_text.get_rect()
-info_rect.topleft = (475, 10)
-i_text = ''
 
 #lo de plata
 money_image = pygame.image.load("coin.png").convert_alpha()
@@ -189,6 +188,30 @@ fondo_general = pygame.transform.scale(fondo_general, (width, height))
 minigame_text = font.render("Minijuego en curso...", True, WHITE)
 minigame_rect = minigame_text.get_rect()
 minigame_rect.center = (width // 2, height // 2)
+
+#textbox
+skin_text = font.render("¡Usa <a> y <d> para ponerle trajes al salame!", True, BLACK)
+skin_text_rect = no_food_text.get_rect()
+skin_text_rect.bottomleft = (100, height)
+#-------------------------------botón de info--------------------------------
+info_text = ''
+def info_display():
+    global show_info
+    show_info = True
+
+info_button = Button(
+                screen,
+                400, 
+                10, 
+                390, 
+                46,
+                font=font,
+                text="Presiona acá para info",
+                onClick=info_display,
+                inactiveColour=PURPLE,
+                hoverColour=ACCENT,
+                pressedColour=GRAY
+            )
 #------------------------------------------------------------para nivel de energía------------------------------------------------------
 def progress():
     return float(salame.health/100)
@@ -200,7 +223,7 @@ health_bar = ProgressBar(
     180,               
     30,                
     progress=progress,
-    completedColour=PURPLE,
+    completedColour=GREEN,
     incompletedColour=GRAY,
     )
 health_bar.show()
@@ -210,9 +233,11 @@ health_bar.show()
 backgrounds = (cocina, fondo_general, fondo_general, fondo_general)
 current_background = backgrounds[0]
 index = 0
+dif_background = True
 
 show_info = False
 buymenu = False
+
 # trajes
 current_skin = "salame_normal.png"
 skin_index = 0
@@ -404,11 +429,13 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
+                dif_background = True
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
-            elif event.key == pygame.K_i:
-                if not index == 1:
-                    i_text = ''
+                dif_background = True
+            elif event.key == pygame.K_RETURN:
+                if show_info:
+                    info_text = ''
                     show_info = not show_info
             elif event.key == pygame.K_b:
                 if index == 0:
@@ -429,18 +456,37 @@ while running:
                     skin_index = (skin_index + 1) % 7
 
     current_background = backgrounds[index]
+    if dif_background:
+        textbox.hide()
+        buckshot.hide()
+        blackjack.hide()
+        lluvia_comida.hide()
+        pong.hide()
+        dif_background = False
+
     if button_flag_state and button_flag is not None:
         pygame_widgets.update(events)
         pygame.display.update()
         continue
     elif show_info:
         screen.fill(WHITE)
-        if not i_text:
-            with open(get_path("info.txt"), "r", encoding="utf-8") as f:
-                i_text = f.read()
-                i_text = i_text.splitlines()
+        if not info_text:
+            match index:
+                case 0:
+                    info_text = "info_food.txt"
+                case 1:
+                    info_text = "info_textbox.txt"
+                case 2:
+                    info_text = "info_games.txt"
+                case 3:
+                    info_text = "info_skins.txt"
+
+            with open(get_path(info_text), "r", encoding="utf-8") as f:
+                info_text = f.read()
+                info_text = info_text.splitlines()
+
         height_offset = 10
-        for line in i_text:
+        for line in info_text:
             rendered_line = font.render(line, True, BLACK)
             line_rect = rendered_line.get_rect()
             line_rect.topleft = (10, height_offset)
@@ -456,64 +502,62 @@ while running:
         health_bar.show()
         render_money()
         screen.blit(money_image, money_image_rect)
-        if not index == 1:
-            screen.blit(info_text, info_rect)
 
-        if index == 0:  
-            if buymenu:
-                screen.fill(WHITE)
-                health_bar.hide()
-                page_foods = read_page(current_page)
-                general_buttons.append(page_foods)
-                height_offset = 0
-                for current_food in page_foods:
-                    current_food.rect.topleft = (10, 2 + height_offset)
-                    text = font.render(f"{current_food.name} | Salud: {current_food.health} | Precio: {current_food.value}", True, BLACK)
-                    current_food.draw()
-                    screen.blit(text, (100, 22 + height_offset))
-                    height_offset += 85
-                if button_flag_state:
-                    if button_flag is None:
-                        if button_flag_type == "no money":
-                            flag_button("No tienes suficiente dinero")
-                        elif button_flag_type == "max food":
-                            flag_button("No puedes comprar más comida")
-            else:         
-                if bought_food:
-                    screen.blit(arrowright_bottom, arrowright_bottom_rect)
-                    screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
-                    general_buttons.append([bought_food[food_index]])
-                    bought_food[food_index].draw()
-                else:
-                    screen.blit(no_food_text, no_food_rect)
+        match index:
+            case 0:  
+                if buymenu:
+                    screen.fill(WHITE)
+                    health_bar.hide()
+                    info_button.hide()
+                    page_foods = read_page(current_page)
+                    general_buttons.append(page_foods)
+                    height_offset = 0
+                    for current_food in page_foods:
+                        current_food.rect.topleft = (10, 2 + height_offset)
+                        text = font.render(f"{current_food.name} | Salud: {current_food.health} | Precio: {current_food.value}", True, BLACK)
+                        current_food.draw()
+                        screen.blit(text, (100, 22 + height_offset))
+                        height_offset += 85
+                    if button_flag_state:
+                        if button_flag is None:
+                            if button_flag_type == "no money":
+                                flag_button("No tienes suficiente dinero")
+                            elif button_flag_type == "max food":
+                                flag_button("No puedes comprar más comida")
+                else:         
+                    if bought_food:
+                        screen.blit(arrowright_bottom, arrowright_bottom_rect)
+                        screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
+                        if food_index < 0 or food_index >= len(bought_food):
+                            food_index = 0
+                        general_buttons.append([bought_food[food_index]])
+                        bought_food[food_index].draw()
+                    else:
+                        food_index = 0  
+                        screen.blit(no_food_text, no_food_rect)
 
-        if index == 1:
-            textbox.show()
-            if salame_reply and not salame_reply_rendered:
-                flag_button(salame_reply)
-                salame_reply_rendered = True
-        else:
-            textbox.hide()
-        
-        if index == 2:
-            buckshot.show()
-            blackjack.show()
-            lluvia_comida.show()
-            pong.show()
-        else:
-            buckshot.hide()
-            blackjack.hide()
-            lluvia_comida.hide()
-            pong.hide()
+            case 1:
+                textbox.show()
+                if salame_reply and not salame_reply_rendered:
+                    flag_button(salame_reply)
+                    salame_reply_rendered = True
 
-        if index == 3:
-            if last_skin_index != skin_index:
-                with open(get_path("skins.txt"), "r") as f:
-                    for index_skin, skin in enumerate(f):
-                        if index_skin == skin_index:
-                            current_skin = skin.strip()
-                salame.image = pygame.image.load(get_path(current_skin)).convert_alpha()
-                salame.image = pygame.transform.scale(salame.image, (400, 400))
-                last_skin_index = skin_index
+            case 2:
+                buckshot.show()
+                blackjack.show()
+                lluvia_comida.show()
+                pong.show()
+
+            case 3:
+                screen.blit(skin_text, skin_text_rect)
+                if last_skin_index != skin_index:
+                    with open(get_path("skins.txt"), "r") as f:
+                        for index_skin, skin in enumerate(f):
+                            if index_skin == skin_index:
+                                current_skin = skin.strip()
+                    salame.image = pygame.image.load(get_path(current_skin)).convert_alpha()
+                    salame.image = pygame.transform.scale(salame.image, (400, 400))
+                    last_skin_index = skin_index
+
         pygame_widgets.update(events)
         pygame.display.update()
