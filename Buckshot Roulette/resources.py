@@ -18,6 +18,8 @@ def load_resources():
 
     title_game = fontr.render("Buckshot",True,grey)
     title_game2 = fontr.render("Roulette",True,grey)
+    ############## PROVISORIO
+    texto_provisorio = font.render("No esta listo todavia",True,white)
 
     #------------------ options screen text 
     text_volumen = font.render("Volumen",True, grey)
@@ -74,16 +76,17 @@ def load_resources():
     #cig = pygame.image.load("Buckshot Roulette/items/cig.png").convert()
     ##cosa = pygame.image.load("Buckshot Roulette/items/eso.png").convert()
     #handsaw = pygame.image.load("Buckshot Roulette/items/handsaw.png").convert()
-
+    
     background = []
 
     for i in range(20):
-        ruta = f"Buckshot Roulette/background_buckshot_roulette/{i}.png"
+        ruta = f"Buckshot Roulette/imagenes/background_buckshot_roulette/{i}.png"
         imagen = pygame.image.load(ruta)
         scale = pygame.transform.scale(imagen ,(width, height))
         background.append(scale)
         
     return    {
+        "texto": texto_provisorio,
         "font": font,
         "background" : background,
         "menu": {"text_play": [text_play, text_play2],
