@@ -193,10 +193,15 @@ minigame_rect.center = (width // 2, height // 2)
 skin_text = font.render("¡Usa <a> y <d> para ponerle trajes al salame!", True, BLACK)
 skin_text_rect = no_food_text.get_rect()
 skin_text_rect.bottomleft = (100, height)
+
+#ai
+ai_text = font.render("Cliqueá el rectángulo para volver", True, BLACK)
+ai_rect = no_food_text.get_rect()
+ai_rect.bottomleft = (175, height)
 #-------------------------------botón de info--------------------------------
 info_text = ''
 def info_display():
-    global show_info
+    global show_info  
     show_info = True
 
 info_button = Button(
@@ -276,12 +281,12 @@ def normalize_unicode(text):
 def ask_salame():
     global salame_reply, salame_wait, textbox
     textbox_text = textbox.getText()
+    textbox.setText("El salamín está pensando... no escribas nada")
     textbox_text = normalize_unicode(textbox_text)
     if salame_wait or not textbox_text.strip():
         return
     else:
         salame_wait = True
-        textbox.setText("El salamín está pensando... no escribas nada")
         try:
             salame_reply = subprocess.run([sys.executable, get_path('mainai.py')], input=textbox_text, timeout=30, capture_output=True, text=True, check=True)
         except subprocess.TimeoutExpired:
@@ -334,13 +339,20 @@ class GameButton:
                 image=self.image
             )
     def run(self):
-        global minigame_text, minigame_rect
+        global minigame_text, minigame_rect, money_value, money_value_str
         process = subprocess.Popen([sys.executable, self.script_path])
         screen.fill(DARK)
         screen.blit(minigame_text, minigame_rect)
         pygame.display.update()
         process.wait()
-
+        with open("money.txt", "r") as m:
+            money_value_str = m.readline().strip()
+            if money_value_str:
+                money_value = int(money_value_str) 
+            else:
+                money_value = 0
+        return 
+    
     def hide(self):
         self.button.hide()
     def show(self):
@@ -361,22 +373,24 @@ button_flag = None
 button_flag_state = False
 button_flag_text = ""
 flag_cooldown = 0
+button_flag_rect = None
 
 def flag_button(text):
-    global button_flag, button_flag_state, button_flag_text, flag_cooldown
+    global button_flag, button_flag_state, button_flag_text, flag_cooldown, button_flag_rect
     if button_flag_state and button_flag_text == text:
         return  
     kill_button_flag()  
 
     text_surface = font.render(text, True, BLACK)
     text_rect = text_surface.get_rect(center=(width // 2, height // 2))
+    button_flag_rect = pygame.Rect(text_rect.x - 10, text_rect.y - 10, text_rect.width + 20, text_rect.height + 20)
 
     button_flag = Button(
         screen,
-        text_rect.x - 10,
-        text_rect.y - 10,
-        text_rect.width + 20,
-        text_rect.height + 20,
+        button_flag_rect.x,
+        button_flag_rect.y,
+        button_flag_rect.width,
+        button_flag_rect.height,
         text=text,
         font=font,
         fontSize=25,
@@ -402,10 +416,12 @@ def kill_button_flag():
     salame_reply = ""
     salame_reply_rendered = False
 
+
+
 def clear_buttons():
     for i in general_buttons:
         for widget in i:
-            widget.hide()
+            del widget
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
@@ -457,6 +473,7 @@ while running:
 
     current_background = backgrounds[index]
     if dif_background:
+        health_bar.hide()
         textbox.hide()
         buckshot.hide()
         blackjack.hide()
@@ -465,9 +482,15 @@ while running:
         dif_background = False
 
     if button_flag_state and button_flag is not None:
+        health_bar.hide()
+        textbox.hide()
+        info_button.hide()
+        screen.fill(CREAM)
+        screen.blit(ai_text, ai_rect)
         pygame_widgets.update(events)
         pygame.display.update()
         continue
+
     elif show_info:
         screen.fill(WHITE)
         if not info_text:
@@ -500,6 +523,7 @@ while running:
         screen.blit(arrowright, arrowright_back_rect)
         screen.blit(arrowleft, arrowleft_back_rect)
         health_bar.show()
+        info_button.show()
         render_money()
         screen.blit(money_image, money_image_rect)
 

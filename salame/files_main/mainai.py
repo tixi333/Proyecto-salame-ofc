@@ -2,7 +2,7 @@ import sys
 from openai import OpenAI
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key="")
+    api_key="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")
 text = sys.stdin.read().strip()
 
 messages_with_instructions = [

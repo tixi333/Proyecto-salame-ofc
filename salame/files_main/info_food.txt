@@ -1,0 +1,9 @@
+Usá las flechas para mover entre menús.
+
+- Usá "d" para moverte un item a la derecha 
+y "a" para la izquierda
+
+- Usá "b" para entrar al menú para comprar 
+y cliqueá en la comida para comprarla
+
+Presioná enter para volver :)
