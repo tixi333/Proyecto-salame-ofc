@@ -417,11 +417,11 @@ def kill_button_flag():
     salame_reply_rendered = False
 
 
-
 def clear_buttons():
     for i in general_buttons:
         for widget in i:
-            del widget
+            widget.hide()
+            widget = None
         general_buttons.clear()
 
 #------------------------------------------------------------bucle principal------------------------------------------------------
@@ -482,11 +482,13 @@ while running:
         dif_background = False
 
     if button_flag_state and button_flag is not None:
-        health_bar.hide()
-        textbox.hide()
-        info_button.hide()
-        screen.fill(CREAM)
-        screen.blit(ai_text, ai_rect)
+        if salame_reply:
+            health_bar.hide()
+            textbox.hide()
+            info_button.hide()
+            screen.fill(CREAM)
+            screen.blit(ai_text, ai_rect)
+
         pygame_widgets.update(events)
         pygame.display.update()
         continue
