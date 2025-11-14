@@ -461,11 +461,13 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                index = (index - 1) % len(backgrounds)
-                dif_background()
+                if not buymenu and not show_info:
+                    index = (index - 1) % len(backgrounds)
+                    dif_background()
             elif event.key == pygame.K_RIGHT:
-                index = (index + 1) % len(backgrounds)
-                dif_background()
+                if not buymenu and not show_info:
+                    index = (index + 1) % len(backgrounds)
+                    dif_background()
             elif event.key == pygame.K_RETURN:
                 if show_info:
                     info_text = ''
