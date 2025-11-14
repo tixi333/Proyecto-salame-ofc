@@ -2,7 +2,8 @@ import sys
 from openai import OpenAI
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key="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")
+    api_key="")
+
 text = sys.stdin.read().strip()
 
 messages_with_instructions = [
@@ -14,9 +15,13 @@ response = client.chat.completions.create(
 model="llama-3.1-8b-instant",
 messages=messages_with_instructions
 )
+
      
 if response and response.choices:
-    print(response.choices[0].message.content.strip())
+    response = response.choices[0].message.content.strip()
+    if len(response) > 40:
+        response = response[:39]
+    print(response)
 else:
     print("...")
 

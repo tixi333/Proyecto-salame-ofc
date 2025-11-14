@@ -194,9 +194,9 @@ flag_rect.bottomleft = (175, height)
 
 #logo huergo :)
 huergo_image = pygame.image.load(get_path("huergo_compu.png")).convert_alpha()
-huergo_image = pygame.transform.scale(huergo_image, (300, 300))
+huergo_image = pygame.transform.scale(huergo_image, (250, 250))
 huergo_rect = huergo_image.get_rect()
-huergo_rect.bottomright = (width - 10, height - 10)
+huergo_rect.bottomright = (width - 20, height - 20)
 
 #-------------------------------botón de info--------------------------------
 info_text = ''
@@ -471,7 +471,7 @@ while running:
                     info_text = ''
                     show_info = not show_info
             elif event.key == pygame.K_b:
-                if index == 0:
+                if index == 0 and not show_info:
                     buymenu = not buymenu
                     clear_buttons(page_foods)
                     if buymenu:
