@@ -502,6 +502,7 @@ while running:
     if button_flag_state and button_flag is not None:
         for i in page_foods:
             i.hide()
+        bought_food[food_index].hide()
         health_bar.hide()
         textbox.hide()
         info_button.hide()
@@ -554,6 +555,7 @@ while running:
                     screen.fill(WHITE)
                     health_bar.hide()
                     info_button.hide()
+                    bought_food[food_index].hide()
                     height_offset = 0
                     for i in page_foods:
                         i.rect.topleft = (10, 2 + height_offset)
