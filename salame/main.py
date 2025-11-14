@@ -90,30 +90,8 @@ class Food:
         else:
             self.rect = rect
 
-    def draw(self):
-        pos = (self.rect.x, self.rect.y, self.rect.width, self.rect.height)
-
-        if not hasattr(self, 'button') or getattr(self, 'button_pos', None) != pos:
-            if hasattr(self, 'button'):
-                try:
-                    self.button = None
-                except Exception:
-                    pass
-            self.button = Button(
-                screen,
-                int(self.rect.x),
-                int(self.rect.y),
-                int(self.rect.width),
-                int(self.rect.height),
-                image=self.image,
-                onClick=self.feed_or_buy
-            )
-            self.button_pos = pos
-        else:
-            self.button.show()
-
     def feed_or_buy(self):
-        global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value, food_index
+        global button_flag_state, button_flag_type, bought_food, salame, buymenu, money_value, food_index, index
         if buymenu:
             if money_value >= self.value:
                 if len(bought_food) < 5:
@@ -127,16 +105,31 @@ class Food:
                 button_flag_state = True
                 button_flag_type = "no money"
     
-        elif current_background == cocina:
+        elif index == 0:
             salame.health = salame.health + self.health
             if salame.health > 100:
                 salame.health = 100
-            bought_food.remove(self)
+            clear_buttons(bought_food[food_index])
+            bought_food.pop(food_index)
             if food_index >= len(bought_food):
                 food_index = max(0, len(bought_food) - 1)
 
+    def show(self):
+        self.button.show()
+
     def hide(self):
         self.button.hide()
+
+    def create_button(self):
+        self.button = Button(
+            screen,
+            int(self.rect.x),
+            int(self.rect.y),
+            int(self.rect.width),
+            int(self.rect.height),
+            image=self.image,
+            onClick=self.feed_or_buy
+        )
 
 #----------------------------seteo comida comprada---------------------------------
 bought_food = []
@@ -194,10 +187,17 @@ skin_text = font.render("¡Usa <a> y <d> para ponerle trajes al salame!", True, 
 skin_text_rect = no_food_text.get_rect()
 skin_text_rect.bottomleft = (100, height)
 
-#ai
-ai_text = font.render("Cliqueá el rectángulo para volver", True, BLACK)
-ai_rect = no_food_text.get_rect()
-ai_rect.bottomleft = (175, height)
+#button flag
+flag_text = font.render("Cliqueá el rectángulo para volver", True, BLACK)
+flag_rect = no_food_text.get_rect()
+flag_rect.bottomleft = (175, height)
+
+#logo huergo :)
+huergo_image = pygame.image.load(get_path("huergo_compu.png")).convert_alpha()
+huergo_image = pygame.transform.scale(huergo_image, (300, 300))
+huergo_rect = huergo_image.get_rect()
+huergo_rect.bottomright = (width - 10, height - 10)
+
 #-------------------------------botón de info--------------------------------
 info_text = ''
 def info_display():
@@ -238,7 +238,6 @@ health_bar.show()
 backgrounds = (cocina, fondo_general, fondo_general, fondo_general)
 current_background = backgrounds[0]
 index = 0
-dif_background = True
 
 show_info = False
 buymenu = False
@@ -250,12 +249,13 @@ last_skin_index = 0
 
 # para manejar la comida comprada
 food_index = 0
+page_foods = []
 
 total_lines = 49
 total_pages = 7
 ITEMS_PER_PAGE = 7
 current_page = 0
-last_page = 0
+
 
 
 def read_page(page):
@@ -281,7 +281,6 @@ def normalize_unicode(text):
 def ask_salame():
     global salame_reply, salame_wait, textbox
     textbox_text = textbox.getText()
-    textbox.setText("El salamín está pensando... no escribas nada")
     textbox_text = normalize_unicode(textbox_text)
     if salame_wait or not textbox_text.strip():
         return
@@ -361,14 +360,13 @@ class GameButton:
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
 blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
 pong =  GameButton("Poung", r"PONG\PINGPOUNG.py", 555, 140)
-buckshot = GameButton("Buckshot",r"Buckshot Roulette\buckshotroulette.py", 555, 400)
+buckshot = GameButton("Buckshot (Demo)",r"Buckshot Roulette\buckshotroulette.py", 555, 400)
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
 #right_mid_rect = pygame.Rect(590, 245, 120, 90)
         
 #------------------------------------------------------------manejo de botones------------------------------------------------------
-general_buttons = []
 button_flag = None
 button_flag_state = False
 button_flag_text = ""
@@ -376,7 +374,7 @@ flag_cooldown = 0
 button_flag_rect = None
 
 def flag_button(text):
-    global button_flag, button_flag_state, button_flag_text, flag_cooldown, button_flag_rect
+    global button_flag, button_flag_state, button_flag_text, button_flag_rect
     if button_flag_state and button_flag_text == text:
         return  
     kill_button_flag()  
@@ -403,7 +401,6 @@ def flag_button(text):
 
     button_flag_state = True
     button_flag_text = text
-    flag_cooldown = time.time()  
 
 
 def kill_button_flag():
@@ -417,18 +414,38 @@ def kill_button_flag():
     salame_reply_rendered = False
 
 
-def clear_buttons():
-    for i in general_buttons:
-        for widget in i:
-            widget.hide()
-            widget = None
-        general_buttons.clear()
+def clear_buttons(buttons):
+    try:
+        for i in buttons:
+            if hasattr(i, "button"):
+                i.hide()
+                del i.button
+            del i
+        buttons.clear()
+    except Exception:
+        if hasattr(buttons, "button"):
+                buttons.hide()
+                del buttons.button
+        del buttons
+    return
 
+def dif_background():
+    global health_bar, textbox, buckshot, blackjack, lluvia_comida, pong, bought_food
+    for i in bought_food:
+        if hasattr(i, "button"):
+            i.hide()
+    health_bar.hide()
+    textbox.hide()
+    buckshot.hide()
+    blackjack.hide()
+    lluvia_comida.hide()
+    pong.hide()
+
+dif_background()
 #------------------------------------------------------------bucle principal------------------------------------------------------
 
 running = True
 while running:
-    clear_buttons()
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
@@ -445,10 +462,10 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 index = (index - 1) % len(backgrounds)
-                dif_background = True
+                dif_background()
             elif event.key == pygame.K_RIGHT:
                 index = (index + 1) % len(backgrounds)
-                dif_background = True
+                dif_background()
             elif event.key == pygame.K_RETURN:
                 if show_info:
                     info_text = ''
@@ -456,39 +473,40 @@ while running:
             elif event.key == pygame.K_b:
                 if index == 0:
                     buymenu = not buymenu
+                    clear_buttons(page_foods)
+                    if buymenu:
+                        page_foods = read_page(current_page)
             elif event.key == pygame.K_a:
                 if buymenu:
                     current_page = (current_page - 1) % total_pages
+                    clear_buttons(page_foods)
+                    page_foods = read_page(current_page)
                 elif index == 0 and bought_food:
+                    bought_food[food_index].hide()
                     food_index = (food_index - 1) % len(bought_food)
                 elif current_background == fondo_general and index == 3:
                     skin_index = (skin_index - 1) % 7
             elif event.key == pygame.K_d:
                 if buymenu:
                     current_page = (current_page + 1) % total_pages
+                    clear_buttons(page_foods)
+                    page_foods = read_page(current_page)
                 elif index == 0 and bought_food:
+                    bought_food[food_index].hide()
                     food_index = (food_index + 1) % len(bought_food)
                 elif current_background == fondo_general and index == 3:
                     skin_index = (skin_index + 1) % 7
 
     current_background = backgrounds[index]
-    if dif_background:
-        health_bar.hide()
-        textbox.hide()
-        buckshot.hide()
-        blackjack.hide()
-        lluvia_comida.hide()
-        pong.hide()
-        dif_background = False
 
     if button_flag_state and button_flag is not None:
-        if salame_reply:
-            health_bar.hide()
-            textbox.hide()
-            info_button.hide()
-            screen.fill(CREAM)
-            screen.blit(ai_text, ai_rect)
-
+        for i in page_foods:
+            i.hide()
+        health_bar.hide()
+        textbox.hide()
+        info_button.hide()
+        screen.fill(CREAM)
+        screen.blit(flag_text, flag_rect)
         pygame_widgets.update(events)
         pygame.display.update()
         continue
@@ -509,7 +527,6 @@ while running:
             with open(get_path(info_text), "r", encoding="utf-8") as f:
                 info_text = f.read()
                 info_text = info_text.splitlines()
-
         height_offset = 10
         for line in info_text:
             rendered_line = font.render(line, True, BLACK)
@@ -517,6 +534,8 @@ while running:
             line_rect.topleft = (10, height_offset)
             screen.blit(rendered_line, line_rect)
             height_offset += line_rect.height + 5
+
+        screen.blit(huergo_image, huergo_rect)
         pygame.display.update() 
         continue
     else:
@@ -535,15 +554,17 @@ while running:
                     screen.fill(WHITE)
                     health_bar.hide()
                     info_button.hide()
-                    page_foods = read_page(current_page)
-                    general_buttons.append(page_foods)
                     height_offset = 0
-                    for current_food in page_foods:
-                        current_food.rect.topleft = (10, 2 + height_offset)
-                        text = font.render(f"{current_food.name} | Salud: {current_food.health} | Precio: {current_food.value}", True, BLACK)
-                        current_food.draw()
+                    for i in page_foods:
+                        i.rect.topleft = (10, 2 + height_offset)
+                        if not hasattr(i, "button"):
+                            i.create_button()
+                        i.show()
+                        text = font.render(f"{i.name} | Salud: {i.health} | Precio: {i.value}", True, BLACK)
                         screen.blit(text, (100, 22 + height_offset))
                         height_offset += 85
+                    last_page = current_page
+
                     if button_flag_state:
                         if button_flag is None:
                             if button_flag_type == "no money":
@@ -556,8 +577,9 @@ while running:
                         screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
                         if food_index < 0 or food_index >= len(bought_food):
                             food_index = 0
-                        general_buttons.append([bought_food[food_index]])
-                        bought_food[food_index].draw()
+                        if not hasattr(bought_food[food_index], "button"):
+                            bought_food[food_index].create_button()
+                        bought_food[food_index].show()
                     else:
                         food_index = 0  
                         screen.blit(no_food_text, no_food_rect)
