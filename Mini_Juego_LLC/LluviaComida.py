@@ -154,9 +154,15 @@ def actualizar_jugador(teclas, jugador_rect, velocidad_y, en_suelo, salto, grave
     return jugador_rect, velocidad_y, en_suelo
 
 def sumar_moneda():
-    global monedas
+    ruta = "money.txt"
+    try:
+        with open(ruta, "r") as f:
+            monedas = int(f.read())
+    except (FileNotFoundError, ValueError):
+        monedas = 0
     monedas += 100
-
+    with open(ruta, "w") as f:
+        f.write(str(monedas))
 def actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas):
     for i in range(len(comidas)):
         img, rect, delay = comidas[i]
@@ -211,49 +217,97 @@ def dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img
         mostrar_texto_centrado("Presiona cualquier tecla para reiniciar", fuente, NEGRO, pantalla, offset_y=120)
     pygame.display.flip()
 
-# --- Main ---
+def pantalla_inicio(pantalla, FUENTE):
+    pantalla.fill(BLANCO)
+    titulo = FUENTE.render("¡LLuvia de comida!", True, ROJO)
+    pantalla.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 150))
+    instrucciones = [
+        "Mueve con las flechas ← →",
+        "Salta con ESPACIO",
+        "Atrapa la comida buena para sumar puntos",
+        "Evita la comida mala y no dejes caer la buena",
+        "",
+        "Presiona ENTER para comenzar",
+        "Presiona ESC para salir"
+    ]
+    for i, texto in enumerate(instrucciones):
+        linea = FUENTE.render(texto, True, NEGRO)
+        pantalla.blit(linea, (ANCHO // 2 - linea.get_width() // 2, 250 + i * 40))
+    pygame.display.flip()
+    pygame.display.set_icon(pygame.image.load("salame.png").convert_alpha())
+    esperando = True
+    while esperando:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_RETURN:
+                    esperando = False
+                elif evento.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
+def manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect):
+    global monedas
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            with open('money.txt', 'w') as f:
+                f.write(str(monedas))
+            pygame.quit()
+            sys.exit()
+        if evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_ESCAPE:
+                return "menu"
+        if game_over and evento.type == pygame.KEYDOWN:
+            return True
+    return False
+
 def main():
-    pantalla, fuente, fuente_grande, clock = inicializar()
-    jugador_img, comidas_imgs, comida_mala_img, background_img = cargar_imagenes()
-    jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
-    pantalla_inicio(pantalla, fuente)
-    velocidad_y = 0
-    gravedad = 0.5
-    salto = -10
-    en_suelo = False
-    velocidad_movimiento = 5
-    velocidad_comida = 2
-    puntaje = 0
-    vidas = 3
-    game_over = False
-    record= cargar_record()
-    
-
-    
     while True:
-        reiniciar_juego = manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect)
-        if reiniciar_juego:
-            if puntaje > record:
-                guardar_record(puntaje)
-                record=puntaje
-            jugador_rect, comidas, comida_mala_rect = reiniciar(jugador_rect, comidas, comida_mala_rect)
-            puntaje = 0
-            vidas = 3
-            game_over = False
+        pantalla, fuente, fuente_grande, clock = inicializar()
+        jugador_img, comidas_imgs, comida_mala_img, background_img = cargar_imagenes()
+        jugador_rect, comidas, comida_mala_rect, suelo = crear_rectangulos(jugador_img, comidas_imgs, comida_mala_img)
+        pantalla_inicio(pantalla, fuente)
+        velocidad_y = 0
+        gravedad = 0.5
+        salto = -10
+        en_suelo = False
+        velocidad_movimiento = 5
+        velocidad_comida = 2
+        puntaje = 0
+        vidas = 3
+        game_over = False
+        record= cargar_record()
 
-        if not game_over:
-            teclas = pygame.key.get_pressed()
-            jugador_rect, velocidad_y, en_suelo = actualizar_jugador(
-                teclas, jugador_rect, velocidad_y, en_suelo, salto, gravedad, velocidad_movimiento, suelo
-            )
-            comidas, puntaje, vidas = actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas)
-            comida_mala_rect, vidas = actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas)
-            if vidas <= 0:
-                game_over = True
-            
-        dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect,
-        fuente, fuente_grande, puntaje, vidas, game_over, record, background_img)
-        clock.tick(FPS)
+        jugando = True
+        while jugando:
+            reiniciar_juego = manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect)
+            if reiniciar_juego == "menu":
+                jugando = False
+                break # vuelve al menú
+            elif reiniciar_juego:
+                if puntaje > record:
+                    guardar_record(puntaje)
+                    record=puntaje
+                jugador_rect, comidas, comida_mala_rect = reiniciar(jugador_rect, comidas, comida_mala_rect)
+                puntaje = 0
+                vidas = 3
+                game_over = False
+
+            if not game_over:
+                teclas = pygame.key.get_pressed()
+                jugador_rect, velocidad_y, en_suelo = actualizar_jugador(
+                    teclas, jugador_rect, velocidad_y, en_suelo, salto, gravedad, velocidad_movimiento, suelo
+                )
+                comidas, puntaje, vidas = actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas)
+                comida_mala_rect, vidas = actualizar_comida_mala(comida_mala_rect, jugador_rect, velocidad_comida, vidas)
+                if vidas <= 0:
+                    game_over = True
+                
+            dibujar(pantalla, jugador_img, jugador_rect, suelo, comidas, comida_mala_img, comida_mala_rect,
+            fuente, fuente_grande, puntaje, vidas, game_over, record, background_img)
+            clock.tick(FPS)
 
 if __name__ == "__main__":
     main()

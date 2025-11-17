@@ -81,6 +81,8 @@ def load_resources():
     # BACKGROUND GAME
     background_g = pygame.image.load("Buckshot Roulette/imagenes/mesa_bs.png").convert()
     background_g = pygame.transform.scale(background_g ,(width, height))
+    general_release = pygame.image.load("Buckshot Roulette/imagenes/general_release_of_liability.png").convert()
+    general_release = pygame.transform.scale(general_release,(150,200))
     
     idle_enemy = []
     for i in range(14):
@@ -98,6 +100,7 @@ def load_resources():
         background.append(scale)
         
     return    {
+        "gr" : general_release,
         "idle_sprites": idle_enemy,
         "background_g": background_g,
         "texto": texto_provisorio,
