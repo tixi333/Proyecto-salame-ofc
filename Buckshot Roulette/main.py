@@ -2,13 +2,15 @@ import pygame
 import random
 from setup import init_pygame
 from resources import load_resources
-#from game import run_game
+from game import run_game
 
 init_pygame()
-resources = load_resources()
 
-screen = pygame.display.set_mode((resources["width"],resources["height"]))
+
+screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Buckshot Roullete")  
+
+resources = load_resources()
 
 actual_screen = "main_screen"
 
@@ -147,7 +149,7 @@ def draw(last_update,frame_index):
     elif actual_screen == "play_screen":   #screen
         screen.fill(resources["colors"][3])
         screen.blit(resources["texto"],(0,0))
-        #run_game(screen)
+        run_game(screen,resources)
     
     elif actual_screen == "options_screen":   #screen
         screen.fill(resources["colors"][3])
@@ -208,6 +210,10 @@ while running:
                 button.handle_event(button_activate, event)
 
         elif actual_screen == "play_screen":
+            if not play_started:
+                play_started = True
+                run_game(screen,resources)
+        
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "menu_screen"

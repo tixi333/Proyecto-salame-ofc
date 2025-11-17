@@ -76,6 +76,18 @@ def load_resources():
     #cig = pygame.image.load("Buckshot Roulette/items/cig.png").convert()
     ##cosa = pygame.image.load("Buckshot Roulette/items/eso.png").convert()
     #handsaw = pygame.image.load("Buckshot Roulette/items/handsaw.png").convert()
+    #------------------
+    
+    # BACKGROUND GAME
+    background_g = pygame.image.load("Buckshot Roulette/imagenes/mesa_bs.png").convert()
+    background_g = pygame.transform.scale(background_g ,(width, height))
+    
+    idle_enemy = []
+    for i in range(14):
+        ruta = f"Buckshot Roulette/imagenes/idle/{i}.png"
+        imagen = pygame.image.load(ruta)
+        scale = pygame.transform.scale(imagen ,(200, 200))
+        idle_enemy.append(scale)
     
     background = []
 
@@ -86,6 +98,8 @@ def load_resources():
         background.append(scale)
         
     return    {
+        "idle_sprites": idle_enemy,
+        "background_g": background_g,
         "texto": texto_provisorio,
         "font": font,
         "background" : background,
