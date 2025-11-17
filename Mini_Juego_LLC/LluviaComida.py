@@ -9,7 +9,9 @@ BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
 FPS = 60
-
+monedas = 0
+with open('money.txt', 'r') as f:
+    monedas = int(f.read())
 
 def pantalla_inicio(pantalla, FUENTE):
     pantalla.fill(BLANCO)
@@ -106,8 +108,11 @@ def reiniciar(jugador_rect, comidas, comida_mala_rect):
     return jugador_rect, comidas, comida_mala_rect
 
 def manejar_eventos(game_over, jugador_rect, comidas, comida_mala_rect):
+    global monedas
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
+            with open('money.txt', 'w') as f:
+                f.write(str(monedas))
             pygame.quit()
             sys.exit()
         if game_over and evento.type == pygame.KEYDOWN:
@@ -155,10 +160,9 @@ def sumar_moneda():
             monedas = int(f.read())
     except (FileNotFoundError, ValueError):
         monedas = 0
-    monedas += 49
+    monedas += 100
     with open(ruta, "w") as f:
         f.write(str(monedas))
-
 def actualizar_comidas(comidas, jugador_rect, velocidad_comida, puntaje, vidas):
     for i in range(len(comidas)):
         img, rect, delay = comidas[i]

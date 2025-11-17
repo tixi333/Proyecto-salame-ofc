@@ -18,7 +18,7 @@ def load_font(path_or_name, size):
         return pygame.font.Font(None, size)
 
 font_menu = load_font('monogram-extended.ttf', 30)
-font20 = load_font('freesansbold.ttf', 20)
+font20 = load_font('monogram-extended.ttf', 20)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -245,6 +245,15 @@ def main():
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    if mode == "PVE":
+                        geek1Score -= geek2Score
+                        if geek1Score < 0:
+                            geek1Score = 0
+                        geek1Score *= 200
+                        with open('money.txt', 'r') as f:
+                            geek1Score += int(f.readline().strip())
+                        with open('money.txt', 'w') as f:
+                            f.write(str(geek1Score))   
                     pygame.quit()
                     return
                 if event.type == pygame.KEYDOWN:

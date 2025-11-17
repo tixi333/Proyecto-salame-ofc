@@ -5,11 +5,12 @@ from resources import load_resources
 from game import run_game
 
 init_pygame()
-resources = load_resources()
 
 
-screen = pygame.display.set_mode((resources["width"],resources["height"]))
+screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Buckshot Roullete")  
+
+resources = load_resources()
 
 actual_screen = "main_screen"
 
@@ -126,7 +127,7 @@ def draw(last_update,frame_index):
         current_time = pygame.time.get_ticks()
         if current_time - last_update > frame_delay:
             frame_index = (frame_index + 1) % len(resources["background"])
-            last_update = current_time      
+            last_update = current_time     
         screen.blit(resources["background"][frame_index], (0, 0))
         screen.blit(resources["general"][1],(250,500))
         screen.blit(resources["title"][0],(240,0))
@@ -147,7 +148,8 @@ def draw(last_update,frame_index):
 
     elif actual_screen == "play_screen":   #screen
         screen.fill(resources["colors"][3])
-        run_game(screen)
+        screen.blit(resources["texto"],(0,0))
+        run_game(screen,resources)
     
     elif actual_screen == "options_screen":   #screen
         screen.fill(resources["colors"][3])
@@ -195,7 +197,7 @@ while running:
                 button.handle_event(event)
 
 
-        elif actual_screen == "options_screen":
+        elif actual_screen == "options_screen" or actual_screen:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "menu_screen"
@@ -206,6 +208,15 @@ while running:
 
             for button in button_activate:
                 button.handle_event(button_activate, event)
+
+        elif actual_screen == "play_screen":
+            if not play_started:
+                play_started = True
+                run_game(screen,resources)
+        
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    actual_screen = "menu_screen"
 
         elif actual_screen == "how2play_screen":
             if event.type == pygame.KEYDOWN:

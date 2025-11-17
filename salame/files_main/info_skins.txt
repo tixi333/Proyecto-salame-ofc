@@ -1,0 +1,6 @@
+Usá las flechas para mover entre menús.
+
+-Usá "d" para moverte un traje a la derecha 
+y "a" para la izquierda
+
+Presioná enter para volver :)

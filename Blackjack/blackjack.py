@@ -184,6 +184,8 @@ def main():
         
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
+                with open('money.txt', 'w') as f:
+                    f.write(str(dinero))
                 pygame.quit()
                 sys.exit()
 
