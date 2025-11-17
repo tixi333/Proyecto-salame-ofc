@@ -2,7 +2,7 @@ import sys
 from openai import OpenAI
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key="")
+    api_key="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")
 
 text = sys.stdin.read().strip()
 
@@ -19,8 +19,8 @@ messages=messages_with_instructions
      
 if response and response.choices:
     response = response.choices[0].message.content.strip()
-    if len(response) > 40:
-        response = response[:39]
+    if len(response) > 50:
+        response = response[:49]
     print(response)
 else:
     print("...")

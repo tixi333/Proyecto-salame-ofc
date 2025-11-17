@@ -144,26 +144,16 @@ if os.path.getsize(get_path("food_bought.txt")) > 1:
 # flechas generales de todos los back (salvo los flags)
 arrowright = pygame.image.load("arrowright.png").convert_alpha()
 arrowright = pygame.transform.scale(arrowright, (100, 100))
-arrowright_back_rect = arrowright.get_rect()
-arrowright_back_rect.center = (width // 2, height // 2)
-arrowright_back_rect.left = arrowright_back_rect.right + 200
 arrowleft = pygame.image.load("arrowleft.png").convert_alpha()
 arrowleft = pygame.transform.scale(arrowleft, (100, 100))
-arrowleft_back_rect = arrowleft.get_rect()
-arrowleft_back_rect.center = (width // 2, height // 2)
-arrowleft_back_rect.right = arrowleft_back_rect.left - 200
 
 # flechas inferiores para el menú de comida comprada (sólo en el fondo azul)
 arrowleft_bottom = pygame.transform.scale(arrowleft, (40, 40))
-arrowleft_bottom_rect = arrowleft_bottom.get_rect()
-arrowleft_bottom_rect.midbottom = (width // 2 - 100, height)
 arrowright_bottom = pygame.transform.scale(arrowright, (40, 40))
-arrowright_bottom_rect = arrowright_bottom.get_rect()
-arrowright_bottom_rect.midbottom = (width // 2 + 100, height)
+
 no_food_text = font.render("No tienes comida comprada", True, BLACK)
 no_food_rect = no_food_text.get_rect()
 no_food_rect.midbottom = (width // 2, height)
-
 
 #lo de plata
 money_image = pygame.image.load("coin.png").convert_alpha()
@@ -193,11 +183,88 @@ flag_rect = no_food_text.get_rect()
 flag_rect.bottomleft = (175, height)
 
 #logo huergo :)
-huergo_image = pygame.image.load(get_path("huergo_compu.png")).convert_alpha()
+huergo_image = pygame.image.load(get_path("huergo_compu.jpg")).convert_alpha()
 huergo_image = pygame.transform.scale(huergo_image, (250, 250))
 huergo_rect = huergo_image.get_rect()
 huergo_rect.bottomright = (width - 20, height - 20)
 
+#------------------botones flecha izquierda y derecha-----------------------------
+def left_arrow():
+    global index, backgrounds
+    dif_background()
+    index = (index - 1) % len(backgrounds)
+
+def right_arrow():
+    global index, backgrounds
+    dif_background()
+    index = (index + 1) % len(backgrounds)
+
+def left_mini_arrow():
+    global food_index, bought_food
+    try:
+        bought_food[food_index].hide()
+    except Exception:
+        pass
+    food_index = (food_index - 1) % len(bought_food)
+
+def right_mini_arrow():
+    global food_index, bought_food
+    try:
+        bought_food[food_index].hide()
+    except Exception:
+        pass
+    food_index = (food_index + 1) % len(bought_food)
+
+left_arrow = Button(
+                screen,
+                10,
+                height // 2 - 50,
+                100,
+                100,
+                image=arrowleft,
+                onClick=left_arrow,
+                inactiveColour=WHITE,
+                hoverColour=GRAY,
+                pressedColour=ACCENT
+            )
+right_arrow = Button(
+                screen,
+                width - 110,
+                height // 2 - 50,
+                100,
+                100,
+                image=arrowright,
+                onClick=right_arrow,
+                inactiveColour=WHITE,
+                hoverColour=GRAY,
+                pressedColour=ACCENT
+            )
+
+left_mini_arrow = Button(
+                screen,
+                280,
+                545,
+                40,
+                40,
+                image=arrowleft_bottom,
+                onClick=left_mini_arrow,
+                inactiveColour=WHITE,
+                hoverColour=GRAY,
+                pressedColour=ACCENT
+            )
+
+right_mini_arrow = Button(
+                screen,
+                480,
+                545,
+                40,
+                40,
+                image=arrowright_bottom,
+                onClick=right_mini_arrow,
+                inactiveColour=WHITE,
+                hoverColour=GRAY,
+                pressedColour=ACCENT
+            )
 #-------------------------------botón de info--------------------------------
 info_text = ''
 def info_display():
@@ -255,8 +322,6 @@ total_lines = 49
 total_pages = 7
 ITEMS_PER_PAGE = 7
 current_page = 0
-
-
 
 def read_page(page):
     start_line = page * ITEMS_PER_PAGE
@@ -430,16 +495,21 @@ def clear_buttons(buttons):
     return
 
 def dif_background():
-    global health_bar, textbox, buckshot, blackjack, lluvia_comida, pong, bought_food
-    for i in bought_food:
-        if hasattr(i, "button"):
-            i.hide()
+    global health_bar, textbox, buckshot, blackjack, lluvia_comida, pong, bought_food, food_index, left_arrow, right_arrow, left_mini_arrow, right_mini_arrow
+    try:
+        bought_food[food_index].hide()
+    except Exception:
+        pass
     health_bar.hide()
     textbox.hide()
     buckshot.hide()
     blackjack.hide()
     lluvia_comida.hide()
     pong.hide()
+    left_arrow.hide()
+    right_arrow.hide()
+    left_mini_arrow.hide()
+    right_mini_arrow.hide()
 
 dif_background()
 #------------------------------------------------------------bucle principal------------------------------------------------------
@@ -484,7 +554,10 @@ while running:
                     clear_buttons(page_foods)
                     page_foods = read_page(current_page)
                 elif index == 0 and bought_food:
-                    bought_food[food_index].hide()
+                    try:
+                        bought_food[food_index].hide()
+                    except Exception:
+                        pass
                     food_index = (food_index - 1) % len(bought_food)
                 elif current_background == fondo_general and index == 3:
                     skin_index = (skin_index - 1) % 7
@@ -494,7 +567,10 @@ while running:
                     clear_buttons(page_foods)
                     page_foods = read_page(current_page)
                 elif index == 0 and bought_food:
-                    bought_food[food_index].hide()
+                    try:
+                        bought_food[food_index].hide()
+                    except Exception:
+                        pass
                     food_index = (food_index + 1) % len(bought_food)
                 elif current_background == fondo_general and index == 3:
                     skin_index = (skin_index + 1) % 7
@@ -505,12 +581,7 @@ while running:
         for i in page_foods:
             if hasattr(i, "button"):
                 i.hide()
-        for i in bought_food:
-            if hasattr(i, "button"):
-                i.hide()
-        health_bar.hide()
-        textbox.hide()
-        info_button.hide()
+        dif_background()        
         screen.fill(CREAM)
         screen.blit(flag_text, flag_rect)
         pygame_widgets.update(events)
@@ -540,17 +611,16 @@ while running:
             line_rect.topleft = (10, height_offset)
             screen.blit(rendered_line, line_rect)
             height_offset += line_rect.height + 5
-
         screen.blit(huergo_image, huergo_rect)
         pygame.display.update() 
         continue
     else:
         screen.blit(current_background, (0, 0))
         salame.draw(screen)
-        screen.blit(arrowright, arrowright_back_rect)
-        screen.blit(arrowleft, arrowleft_back_rect)
         health_bar.show()
         info_button.show()
+        left_arrow.show()
+        right_arrow.show()
         render_money()
         screen.blit(money_image, money_image_rect)
 
@@ -560,9 +630,14 @@ while running:
                     screen.fill(WHITE)
                     health_bar.hide()
                     info_button.hide()
-                    for i in bought_food:
-                        if hasattr(i, "button"):
-                            i.hide()
+                    left_arrow.hide()
+                    right_arrow.hide()
+                    left_mini_arrow.hide()
+                    right_mini_arrow.hide()
+                    try:
+                        bought_food[food_index].hide()
+                    except Exception:
+                        pass
                     height_offset = 0
                     for i in page_foods:
                         i.rect.topleft = (10, 2 + height_offset)
@@ -582,14 +657,16 @@ while running:
                                 flag_button("No puedes comprar más comida")
                 else:         
                     if bought_food:
-                        screen.blit(arrowright_bottom, arrowright_bottom_rect)
-                        screen.blit(arrowleft_bottom, arrowleft_bottom_rect)
+                        left_mini_arrow.show()
+                        right_mini_arrow.show()
                         if food_index < 0 or food_index >= len(bought_food):
                             food_index = 0
                         if not hasattr(bought_food[food_index], "button"):
                             bought_food[food_index].create_button()
                         bought_food[food_index].show()
                     else:
+                        left_mini_arrow.hide()
+                        right_mini_arrow.hide()
                         food_index = 0  
                         screen.blit(no_food_text, no_food_rect)
 
