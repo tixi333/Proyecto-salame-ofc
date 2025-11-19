@@ -53,12 +53,29 @@ with open("money.txt", "r") as m:
     else:
         money_value = 0 
 
-#-------------------funcion renderizar plata-------------------------
+#-------------------funcion renderizar plata / definicion de fondo -------------------------
 def render_money():
     global money_value
     text_surface = font.render(str(money_value), True, BLACK)
     rect = text_surface.get_rect()
     rect.topleft = (55, 15)
+    screen.blit(text_surface, rect)
+
+def render_name_background():
+    global index
+    match index:
+        case 0:
+            name_background = "Estás en la cocina"
+        case 1:
+            name_background = "Estás en la sala para hablar con Salamín"
+        case 2:
+            name_background = "Estás en la sala de juegos"
+        case 3:
+            name_background = "Estás en el vestuario"
+    text_surface = font.render(name_background, True, BLACK)
+    rect = text_surface.get_rect()
+    rect.topleft = (10, 70)
+    screen.fill(CREAM, rect=rect)
     screen.blit(text_surface, rect)
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
 class Salame:
@@ -189,17 +206,17 @@ huergo_rect = huergo_image.get_rect()
 huergo_rect.bottomright = (width - 20, height - 20)
 
 #------------------botones flecha izquierda y derecha-----------------------------
-def left_arrow():
+def left_arrow_f():
     global index, backgrounds
     dif_background()
     index = (index - 1) % len(backgrounds)
 
-def right_arrow():
+def right_arrow_f():
     global index, backgrounds
     dif_background()
     index = (index + 1) % len(backgrounds)
 
-def left_mini_arrow():
+def left_mini_arrow_f():
     global food_index, bought_food
     try:
         bought_food[food_index].hide()
@@ -207,7 +224,7 @@ def left_mini_arrow():
         pass
     food_index = (food_index - 1) % len(bought_food)
 
-def right_mini_arrow():
+def right_mini_arrow_f():
     global food_index, bought_food
     try:
         bought_food[food_index].hide()
@@ -222,7 +239,7 @@ left_arrow = Button(
                 100,
                 100,
                 image=arrowleft,
-                onClick=left_arrow,
+                onClick=left_arrow_f,
                 inactiveColour=WHITE,
                 hoverColour=GRAY,
                 pressedColour=ACCENT
@@ -234,7 +251,7 @@ right_arrow = Button(
                 100,
                 100,
                 image=arrowright,
-                onClick=right_arrow,
+                onClick=right_arrow_f,
                 inactiveColour=WHITE,
                 hoverColour=GRAY,
                 pressedColour=ACCENT
@@ -247,7 +264,7 @@ left_mini_arrow = Button(
                 40,
                 40,
                 image=arrowleft_bottom,
-                onClick=left_mini_arrow,
+                onClick=left_mini_arrow_f,
                 inactiveColour=WHITE,
                 hoverColour=GRAY,
                 pressedColour=ACCENT
@@ -260,7 +277,7 @@ right_mini_arrow = Button(
                 40,
                 40,
                 image=arrowright_bottom,
-                onClick=right_mini_arrow,
+                onClick=right_mini_arrow_f,
                 inactiveColour=WHITE,
                 hoverColour=GRAY,
                 pressedColour=ACCENT
@@ -501,6 +518,7 @@ def dif_background():
     except Exception:
         pass
     health_bar.hide()
+    info_button.hide()
     textbox.hide()
     buckshot.hide()
     blackjack.hide()
@@ -622,6 +640,7 @@ while running:
         left_arrow.show()
         right_arrow.show()
         render_money()
+        render_name_background()
         screen.blit(money_image, money_image_rect)
 
         match index:
