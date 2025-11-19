@@ -74,7 +74,7 @@ def render_name_background():
             name_background = "Estás en el vestuario"
     text_surface = font.render(name_background, True, BLACK)
     rect = text_surface.get_rect()
-    rect.topleft = (10, 70)
+    rect.topleft = (10, 65)
     screen.fill(CREAM, rect=rect)
     screen.blit(text_surface, rect)
 #---------------------------------------------------------------clases salame y comida-----------------------------------------------------
@@ -200,7 +200,7 @@ flag_rect = no_food_text.get_rect()
 flag_rect.bottomleft = (175, height)
 
 #logo huergo :)
-huergo_image = pygame.image.load(get_path("huergo_compu.jpg")).convert_alpha()
+huergo_image = pygame.image.load(get_path("huergo_compu.png")).convert_alpha()
 huergo_image = pygame.transform.scale(huergo_image, (250, 250))
 huergo_rect = huergo_image.get_rect()
 huergo_rect.bottomright = (width - 20, height - 20)
