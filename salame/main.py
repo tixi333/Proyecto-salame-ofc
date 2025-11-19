@@ -316,7 +316,14 @@ health_bar = ProgressBar(
     incompletedColour=GRAY,
     )
 health_bar.show()
-
+#------------------------------------------------------------------------------------------------------------------------------
+def health_impact():
+    global salame
+    clock = pygame.time.get_ticks()
+    if salame.health > 0:
+        if clock % 60000 == 0:
+            salame.health -= 1
+    return
 #------------------------------------------------------------------------------------------------------------------------------
 # para manejar fondos
 backgrounds = (cocina, fondo_general, fondo_general, fondo_general)
@@ -594,6 +601,7 @@ while running:
                     skin_index = (skin_index + 1) % 7
 
     current_background = backgrounds[index]
+    health_impact()
 
     if button_flag_state and button_flag is not None:
         for i in page_foods:
