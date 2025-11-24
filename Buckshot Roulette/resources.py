@@ -93,6 +93,12 @@ def load_resources():
     
     background = []
 
+    bala_n = pygame.image.load("Buckshot Roulette/imagenes/bala_n.png").convert_alpha()
+    bala_n = pygame.transform.scale(bala_n ,(75, 75))
+    
+    bala_v = pygame.image.load("Buckshot Roulette/imagenes/bala_viva.png").convert_alpha()
+    bala_v = pygame.transform.scale(bala_v ,(75, 75))
+    
     for i in range(20):
         ruta = f"Buckshot Roulette/imagenes/background_buckshot_roulette/{i}.png"
         imagen = pygame.image.load(ruta)
@@ -100,6 +106,8 @@ def load_resources():
         background.append(scale)
         
     return    {
+        "bala_n": bala_n,
+        "bala_v": bala_v,
         "gr" : general_release,
         "idle_sprites": idle_enemy,
         "background_g": background_g,

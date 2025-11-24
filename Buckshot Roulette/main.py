@@ -148,8 +148,7 @@ def draw(last_update,frame_index):
 
     elif actual_screen == "play_screen":   #screen
         screen.fill(resources["colors"][3])
-        screen.blit(resources["texto"],(0,0))
-        run_game(screen,resources)
+        
     
     elif actual_screen == "options_screen":   #screen
         screen.fill(resources["colors"][3])
@@ -217,6 +216,7 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     actual_screen = "menu_screen"
+        
 
         elif actual_screen == "how2play_screen":
             if event.type == pygame.KEYDOWN:
