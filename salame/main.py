@@ -449,7 +449,7 @@ class GameButton:
 lluvia_comida = GameButton("Lluvia de comida", r"Mini_Juego_LLC\LluviaComida.py", 10, 140)
 blackjack = GameButton("Blackjack", r"Blackjack\blackjack.py", 10, 400)
 pong =  GameButton("Poung", r"PONG\PINGPOUNG.py", 555, 140)
-buckshot = GameButton("Buckshot (Demo)",r"Buckshot Roulette\buckshotroulette.py", 555, 400)
+buckshot = GameButton("Buckshot (Demo)",r"Buckshot Roulette\main.py", 555, 400)
         
 
 #left_mid_rect = pygame.Rect(90, 245, 120, 90)
